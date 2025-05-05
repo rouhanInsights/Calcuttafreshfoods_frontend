@@ -1,103 +1,156 @@
-import Image from "next/image";
+"use client";
+
+import React from "react";
+import HeroSection from "@/components/Herosection/HeroSection";
+import { QuickLinks } from "@/components/QuickLinks/QuickLinks";
+import { CategoryBanner } from "@/components/CategoryGrid/CategoryGrid";
+import { ProductsSection } from "@/components/Products/ProductsSection";
+import { MobileApp } from "@/components/Mobileapp/MobileApp";
+
+const allProducts = [
+  {
+    id: "1",
+    name: "Product name",
+    price: 399,
+    image: "https://placehold.co/400",
+    weight: "500g",
+    discount: 10,
+  },
+  {
+    id: "2",
+    name: "Product name",
+    price: 249,
+    image: "https://placehold.co/400",
+    weight: "500g",
+  },
+  {
+    id: "3",
+    name: "Product name",
+    price: 599,
+    image: "https://placehold.co/400",
+    weight: "500g",
+    discount: 5,
+  },
+  {
+    id: "4",
+    name: "Product name",
+    price: 449,
+    image: "https://placehold.co/400",
+    weight: "1kg",
+  },
+  {
+    id: "5",
+    name: "Product name",
+    price: 449,
+    image: "https://placehold.co/400",
+    weight: "1kg",
+  },
+];
+
+const bestSellers = [
+  {
+    id: "6",
+    name: "Best Seller",
+    price: 299,
+    image: "https://placehold.co/400",
+    weight: "1kg",
+    discount: 8,
+  },
+  {
+    id: "7",
+    name: "Best Seller",
+    price: 599,
+    image: "https://placehold.co/400",
+    weight: "500g",
+  },
+  {
+    id: "8",
+    name: "Best Seller",
+    price: 599,
+    image: "https://placehold.co/400",
+    weight: "500g",
+  },
+  {
+    id: "9",
+    name: "Best Seller",
+    price: 599,
+    image: "https://placehold.co/400",
+    weight: "500g",
+  },
+  {
+    id: "10",
+    name: "Best Seller",
+    price: 599,
+    image: "https://placehold.co/400",
+    weight: "500g",
+  },
+];
+
+const topOffers = [
+  {
+    id: "11",
+    name: "Top Offer",
+    price: 199,
+    image: "https://placehold.co/400",
+    weight: "500g",
+    discount: 15,
+  },
+  {
+    id: "12",
+    name: "Top Offer",
+    price: 299,
+    image: "https://placehold.co/400",
+    weight: "1kg",
+  },
+  {
+    id: "13",
+    name: "Top Offer",
+    price: 299,
+    image: "https://placehold.co/400",
+    weight: "1kg",
+  },
+  {
+    id: "14",
+    name: "Top Offer",
+    price: 299,
+    image: "https://placehold.co/400",
+    weight: "1kg",
+  },
+  {
+    id: "15",
+    name: "Top Offer",
+    price: 299,
+    image: "https://placehold.co/400",
+    weight: "1kg",
+  },
+];
 
 export default function Home() {
   return (
-    <div className="grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)]">
-      <main className="flex flex-col gap-[32px] row-start-2 items-center sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol className="list-inside list-decimal text-sm/6 text-center sm:text-left font-[family-name:var(--font-geist-mono)]">
-          <li className="mb-2 tracking-[-.01em]">
-            Get started by editing{" "}
-            <code className="bg-black/[.05] dark:bg-white/[.06] px-1 py-0.5 rounded font-[family-name:var(--font-geist-mono)] font-semibold">
-              src/app/page.tsx
-            </code>
-            .
-          </li>
-          <li className="tracking-[-.01em]">
-            Save and see your changes instantly.
-          </li>
-        </ol>
+    <>
+      <HeroSection />
+      <QuickLinks />
 
-        <div className="flex gap-4 items-center flex-col sm:flex-row">
-          <a
-            className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:w-auto"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
-            />
-            Deploy now
-          </a>
-          <a
-            className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 w-full sm:w-auto md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Read our docs
-          </a>
-        </div>
-      </main>
-      <footer className="row-start-3 flex gap-[24px] flex-wrap items-center justify-center">
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
-          />
-          Learn
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
-      </footer>
-    </div>
+      {/* Products Sections */}
+      <ProductsSection 
+        title="All Products" 
+        products={allProducts} 
+        viewAllLink="/products/all" 
+      />
+      
+      <ProductsSection 
+        title="Best Sellers" 
+        products={bestSellers} 
+        viewAllLink="/products/bestsellers" 
+      />
+
+      <ProductsSection 
+        title="Top Offers" 
+        products={topOffers} 
+        viewAllLink="/products/topoffers" 
+      />
+      <CategoryBanner />
+      <MobileApp />
+    </>
   );
 }
