@@ -12,9 +12,9 @@ export default function ProfilePage() {
 
   useEffect(() => {
     if (!loading && !user) {
-      router.push("/login");
+      router.push("/profile");
     }
-  }, [user, loading]);
+  }, [user, loading, router]);
 
   if (loading) {
     return <div className="text-center py-10 text-gray-500">Loading...</div>;

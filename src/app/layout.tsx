@@ -1,4 +1,4 @@
-"use client"; 
+"use client";
 
 import { Navbar } from "@/components/Navbar/Navbar";
 import { Footer } from "@/components/Footer/Footer";
@@ -13,15 +13,15 @@ export default function RootLayout({ children }: { children: ReactNode }) {
   return (
     <html lang="en">
       <body>
-        <AuthProvider>
-          <CartProvider>
+        <CartProvider>
+          <AuthProvider>
             <ProductOfferBanner />
-            <Navbar  />
+            <Navbar />
             <main>{children}</main>
             <FloatingCart />
             <Footer />
-          </CartProvider>
-        </AuthProvider>
+          </AuthProvider>
+        </CartProvider>
       </body>
     </html>
   );

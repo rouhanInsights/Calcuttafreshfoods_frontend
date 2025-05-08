@@ -1,154 +1,76 @@
 "use client";
 
-import React from "react";
+import React, { useEffect, useState } from "react";
 import HeroSection from "@/components/Herosection/HeroSection";
 import { QuickLinks } from "@/components/QuickLinks/QuickLinks";
 import { CategoryBanner } from "@/components/CategoryGrid/CategoryGrid";
 import { ProductsSection } from "@/components/Products/ProductsSection";
 import { MobileApp } from "@/components/Mobileapp/MobileApp";
+import { fetchAllProducts } from "@/lib/fetchProducts";
 
-const allProducts = [
-  {
-    id: "1",
-    name: "Product name",
-    price: 399,
-    image: "https://placehold.co/400",
-    weight: "500g",
-    discount: 10,
-  },
-  {
-    id: "2",
-    name: "Product name",
-    price: 249,
-    image: "https://placehold.co/400",
-    weight: "500g",
-  },
-  {
-    id: "3",
-    name: "Product name",
-    price: 599,
-    image: "https://placehold.co/400",
-    weight: "500g",
-    discount: 5,
-  },
-  {
-    id: "4",
-    name: "Product name",
-    price: 449,
-    image: "https://placehold.co/400",
-    weight: "1kg",
-  },
-  {
-    id: "5",
-    name: "Product name",
-    price: 449,
-    image: "https://placehold.co/400",
-    weight: "1kg",
-  },
-];
-
-const bestSellers = [
-  {
-    id: "6",
-    name: "Best Seller",
-    price: 299,
-    image: "https://placehold.co/400",
-    weight: "1kg",
-    discount: 8,
-  },
-  {
-    id: "7",
-    name: "Best Seller",
-    price: 599,
-    image: "https://placehold.co/400",
-    weight: "500g",
-  },
-  {
-    id: "8",
-    name: "Best Seller",
-    price: 599,
-    image: "https://placehold.co/400",
-    weight: "500g",
-  },
-  {
-    id: "9",
-    name: "Best Seller",
-    price: 599,
-    image: "https://placehold.co/400",
-    weight: "500g",
-  },
-  {
-    id: "10",
-    name: "Best Seller",
-    price: 599,
-    image: "https://placehold.co/400",
-    weight: "500g",
-  },
-];
-
-const topOffers = [
-  {
-    id: "11",
-    name: "Top Offer",
-    price: 199,
-    image: "https://placehold.co/400",
-    weight: "500g",
-    discount: 15,
-  },
-  {
-    id: "12",
-    name: "Top Offer",
-    price: 299,
-    image: "https://placehold.co/400",
-    weight: "1kg",
-  },
-  {
-    id: "13",
-    name: "Top Offer",
-    price: 299,
-    image: "https://placehold.co/400",
-    weight: "1kg",
-  },
-  {
-    id: "14",
-    name: "Top Offer",
-    price: 299,
-    image: "https://placehold.co/400",
-    weight: "1kg",
-  },
-  {
-    id: "15",
-    name: "Top Offer",
-    price: 299,
-    image: "https://placehold.co/400",
-    weight: "1kg",
-  },
-];
+type Product = {
+  id: string;
+  name: string;
+  description?: string;
+  price: number;
+  sale_price?: number;
+  image: string;
+  weight: string;
+  discount?: number;
+  stock_quantity: number;
+};
 
 export default function Home() {
+  const [products, setProducts] = useState<Product[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    fetchAllProducts()
+      .then((data) => {
+        setProducts(data);
+        setLoading(false);
+      })
+      .catch((err) => {
+        console.error("Failed to load products:", err);
+        setLoading(false);
+      });
+  }, []);
+
+  if (loading) return <p className="p-4 text-gray-500">Loading products...</p>;
+
+  const topOffers = products
+    .filter((p) => !isNaN(Number(p.discount)) && Number(p.discount) >= 10)
+    .slice(0, 6);
+
+  const bestSellers = [...products]
+    .sort((a, b) => a.stock_quantity - b.stock_quantity)
+    .slice(0, 6);
+
+  const allProducts = [...products].slice(0, 6);
+
   return (
     <>
       <HeroSection />
       <QuickLinks />
 
-      {/* Products Sections */}
-      <ProductsSection 
-        title="All Products" 
-        products={allProducts} 
-        viewAllLink="/products/all" 
-      />
-      
-      <ProductsSection 
-        title="Best Sellers" 
-        products={bestSellers} 
-        viewAllLink="/products/bestsellers" 
+      <ProductsSection
+        title="All Products"
+        products={allProducts}
+        viewAllLink="/products/all"
       />
 
-      <ProductsSection 
-        title="Top Offers" 
-        products={topOffers} 
-        viewAllLink="/products/topoffers" 
+      <ProductsSection
+        title="Best Sellers"
+        products={bestSellers}
+        viewAllLink="/products/bestsellers"
       />
+
+      <ProductsSection
+        title="Top Offers"
+        products={topOffers}
+        viewAllLink="/products/topoffers"
+      />
+
       <CategoryBanner />
       <MobileApp />
     </>

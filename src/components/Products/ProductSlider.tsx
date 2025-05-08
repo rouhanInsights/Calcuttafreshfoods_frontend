@@ -19,9 +19,16 @@ type ProductSliderProps = {
 export const ProductSlider = ({ products }: ProductSliderProps) => {
   return (
     <div className="flex gap-4 overflow-x-auto no-scrollbar py-4">
-      {products.map(product => (
+      {products.map((product) => (
         <div key={product.id} className="min-w-[250px]">
-          <ProductCard {...product} />
+          <ProductCard
+            id={product.id}
+            name={product.name}
+            price={product.price}
+            image={product.image}
+            weight={product.weight ?? ""}
+            discount={product.discount}
+          />
         </div>
       ))}
     </div>

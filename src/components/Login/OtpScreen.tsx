@@ -4,18 +4,19 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { useAuth } from '@/context/AuthContext'
 
 export default function OtpScreen() {
   const [otp, setOtp] = useState("");
   const [verifying, setVerifying] = useState(false);
   const [error, setError] = useState("");
   const router = useRouter();
-
+  const { login } = useAuth(); 
   const identifier = typeof window !== "undefined" ? localStorage.getItem("temp_user") : "";
 
   useEffect(() => {
     if (!identifier) router.push("/");
-  }, [identifier]);
+  }, [identifier, router]);
 
   const handleVerifyOtp = async () => {
     setVerifying(true);
@@ -36,7 +37,8 @@ export default function OtpScreen() {
 
       if (res.ok) {
         localStorage.setItem("token", data.token);
-        localStorage.setItem("user", JSON.stringify(data.user));
+        // localStorage.setItem("user", JSON.stringify(data.user));
+        login(data.token);
         localStorage.removeItem("temp_user");
         router.push("/profile");
       } else {

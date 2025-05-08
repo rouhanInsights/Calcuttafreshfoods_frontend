@@ -1,0 +1,25 @@
+// export async function fetchAllProducts() {
+//   const res = await fetch("http://localhost:5000/api/products", { cache: "no-store" });
+//   if (!res.ok) throw new Error("Failed to fetch products");
+//   return res.json();
+// }
+
+
+export async function fetchAllProducts() {
+  const res = await fetch("http://localhost:5000/api/products", { cache: "no-store" });
+  if (!res.ok) throw new Error("Failed to fetch products");
+
+  const data = await res.json();
+
+  return data.map((item: any) => ({
+    id: item.id,
+    name: item.name,
+    description: item.description,
+    price: parseFloat(item.price),
+    sale_price: item.sale_price ? parseFloat(item.sale_price) : undefined,
+    image: item.image,
+    weight: item.weight,
+    discount: item.discount ? parseInt(item.discount) : 0,
+    stock_quantity: item.stock_quantity ?? 0,
+  }));
+}

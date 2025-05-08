@@ -1,83 +1,87 @@
 "use client";
 
-import React from "react";
-import { useParams } from "next/navigation";
-import { Button } from "@/components/ui/button";
 import { useCart } from "@/context/CartContext";
-import Link from "next/link";
-
-// Dummy product data (can be replaced with backend fetch later)
-const products = [
-  {
-    id: "1",
-    name: "Fresh Rohu Fish",
-    price: 399,
-    image: "https://images.unsplash.com/photo-1493962853295-0fd70327578a?auto=format&fit=crop&w=800&h=600",
-    weight: "500g",
-    description: "A freshwater fish known for its delicious taste and soft meat.",
-    discount: 10,
-  },
-  {
-    id: "2",
-    name: "Boneless Chicken Breast",
-    price: 249,
-    image: "https://images.unsplash.com/photo-1466721591366-2d5fba72006d?auto=format&fit=crop&w=800&h=600",
-    weight: "500g",
-    description: "Tender boneless chicken breasts, perfect for grilling or curry.",
-  },
-];
+import { useEffect, useState } from "react";
+import { useParams } from "next/navigation";
+import Image from "next/image";
 
 export default function ProductDetailPage() {
-  const params = useParams();
-  const { id } = params;
+  const { id } = useParams();
+  const [product, setProduct] = useState<any>(null);
+  const [loading, setLoading] = useState(true);
   const { addToCart } = useCart();
 
-  const product = products.find(p => p.id === id);
+  useEffect(() => {
+    if (id) {
+      fetch(`http://localhost:5000/api/products/${id}`)
+        .then((res) => res.json())
+        .then((data) => {
+          setProduct(data);
+          setLoading(false);
+        })
+        .catch((err) => {
+          console.error("Fetch error:", err);
+          setLoading(false);
+        });
+    }
+  }, [id]);
 
-  if (!product) {
-    return (
-      <div className="p-10 text-center text-gray-500">
-        Product not found.
-        <Link href="/" className="text-green-600 ml-2">Go Home</Link>
-      </div>
-    );
-  }
+  if (loading) return <p className="p-4">Loading...</p>;
+  if (!product) return <p className="p-4 text-red-500">Product not found</p>;
 
-  const handleAddToCart = () => {
-    addToCart(product);
-  };
+  const {
+    name,
+    image,
+    price,
+    sale_price,
+    weight,
+    description,
+    discount,
+  } = product;
+
+  const displayPrice = parseFloat(sale_price) || parseFloat(price);
+  const originalPrice = sale_price ? parseFloat(price) : null;
+  const discountValue = parseInt(discount, 10);
 
   return (
-    <section className="py-12 bg-white min-h-screen">
-      <div className="container mx-auto px-4 md:px-8">
-        <div className="mb-6">
-          <Link href="/" className="text-sm text-green-600 hover:underline">
-            ← Back to Home
-          </Link>
+    <section className="p-6 max-w-4xl mx-auto">
+      <div className="grid md:grid-cols-2 gap-6 items-start">
+        {/* Image Block */}
+        <div className="relative w-full h-80 bg-gray-100 rounded-lg overflow-hidden">
+          <Image
+            src={image}
+            alt={name}
+            fill
+            className="object-contain p-4"
+          />
+          {discountValue > 0 && (
+            <span className="absolute top-3 left-3 bg-red-600 text-white text-xs font-semibold px-2 py-1 rounded-full shadow">
+              {discountValue}% OFF
+            </span>
+          )}
         </div>
 
-        <div className="grid md:grid-cols-2 gap-8 items-center">
-          <img
-            src={product.image}
-            alt={product.name}
-            className="rounded-lg shadow-md w-full h-auto object-cover"
-          />
-          <div>
-            <h1 className="text-3xl font-bold text-gray-800 mb-4">{product.name}</h1>
-            <p className="text-gray-600 mb-2">{product.weight}</p>
-            <p className="text-gray-500 mb-6">{product.description}</p>
-            <div className="flex items-center gap-4 mb-6">
-              <span className="text-green-600 text-2xl font-bold">₹{product.price}</span>
-              {product.discount && (
-                <span className="text-sm bg-red-100 text-red-600 px-2 py-1 rounded">
-                  {product.discount}% OFF
-                </span>
-              )}
-            </div>
-            <Button className="bg-green-600 hover:bg-green-700 text-white" onClick={handleAddToCart}>
-              Add to Cart
-            </Button>
+        {/* Info Block */}
+        <div className="space-y-4">
+          <h1 className="text-3xl font-bold text-gray-800">{name}</h1>
+          <p className="text-sm text-gray-600">{weight}</p>
+          <p className="text-gray-500 text-sm">{description}</p>
+
+          <div className="text-lg font-semibold text-gray-900">
+            ₹{displayPrice}
+            {originalPrice && (
+              <span className="text-base text-gray-400 line-through ml-2">
+                ₹{originalPrice}
+              </span>
+            )}
           </div>
+
+          <button
+            onClick={() => addToCart(product)}
+            className="mt-4 px-5 py-2 bg-green-700 text-white rounded-md hover:bg-green-800 transition"
+          >
+            Add to Cart
+          </button>
         </div>
       </div>
     </section>

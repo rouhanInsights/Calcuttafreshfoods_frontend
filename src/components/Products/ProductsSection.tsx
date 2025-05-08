@@ -7,7 +7,9 @@ import { ProductSlider } from "./ProductSlider";
 type Product = {
   id: string;
   name: string;
+  description?: string;
   price: number;
+  sale_price?: number;
   image: string;
   weight?: string;
   discount?: number;
@@ -19,7 +21,11 @@ type ProductsSectionProps = {
   viewAllLink: string;
 };
 
-export const ProductsSection = ({ title, products, viewAllLink }: ProductsSectionProps) => {
+export const ProductsSection = ({
+  title,
+  products,
+  viewAllLink,
+}: ProductsSectionProps) => {
   return (
     <section className="py-12 bg-gray-50">
       <div className="container mx-auto px-4 md:px-8">

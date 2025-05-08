@@ -22,11 +22,15 @@ type CartContextType = {
   removeFromCart: (id: string) => void;
   clearCart: () => void;
 };
+type Action =
+  | { type: "ADD_TO_CART"; payload: Product }
+  | { type: "REMOVE_FROM_CART"; payload: string }
+  | { type: "CLEAR_CART" };
 
 const CartContext = createContext<CartContextType | undefined>(undefined);
 
 // Reducer for cart state
-function cartReducer(state: CartState, action: any): CartState {
+function cartReducer(state: CartState, action: Action): CartState {
   switch (action.type) {
     case "ADD_TO_CART": {
       const existingItem = state.items.find(item => item.id === action.payload.id);
@@ -45,9 +49,13 @@ function cartReducer(state: CartState, action: any): CartState {
       }
     }
     case "REMOVE_FROM_CART": {
-      return {
-        items: state.items.filter(item => item.id !== action.payload),
-      };
+      const updatedItems = state.items.map(item =>
+        item.id === action.payload
+          ? { ...item, quantity: (item.quantity || 1) - 1 }
+          : item
+      ).filter(item => item.quantity && item.quantity > 0);
+
+      return { items: updatedItems };
     }
     case "CLEAR_CART":
       return { items: [] };
@@ -55,6 +63,7 @@ function cartReducer(state: CartState, action: any): CartState {
       return state;
   }
 }
+
 
 // Provider component
 export const CartProvider = ({ children }: { children: ReactNode }) => {

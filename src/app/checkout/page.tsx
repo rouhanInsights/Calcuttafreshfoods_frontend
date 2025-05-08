@@ -35,6 +35,7 @@ export default function CheckoutPage() {
   const [selectedDate, setSelectedDate] = useState("");
   const [paymentMethod, setPaymentMethod] = useState("COD");
   const [placing, setPlacing] = useState(false);
+  const [showWarning, setShowWarning] = useState(false);
 
   const totalPrice = cart.items.reduce(
     (total, item) => total + (item.price || 0) * (item.quantity || 1),
@@ -42,24 +43,36 @@ export default function CheckoutPage() {
   );
 
   useEffect(() => {
-    if (!loading) {
-      if (!user) {
-        router.push("/login");
-      } else if (!user.name || !user.phone || !user.email) {
-        alert("Please complete your profile before placing an order.");
+    if (!loading && user && (!user.name || !user.phone || !user.email)) {
+      setShowWarning(true);
+      const timer = setTimeout(() => {
+        setShowWarning(false);
         router.push("/profile");
-      }
+      }, 3000);
+      return () => clearTimeout(timer);
     }
-  }, [loading, user]);
+  }, [loading, user, router]);
 
   useEffect(() => {
     fetch("http://localhost:5000/api/slots")
       .then((res) => res.json())
-      .then(setSlots);
+      .then(setSlots)
+      .catch((err) => console.error("Failed to load slots", err));
 
     fetch("http://localhost:5000/api/users/addresses")
       .then((res) => res.json())
-      .then(setAddresses);
+      .then((data) => {
+        if (Array.isArray(data)) {
+          setAddresses(data);
+        } else {
+          console.warn("Unexpected address response:", data);
+          setAddresses([]);
+        }
+      })
+      .catch((err) => {
+        console.error("Failed to load addresses", err);
+        setAddresses([]);
+      });
   }, []);
 
   const handlePlaceOrder = async () => {
@@ -83,14 +96,12 @@ export default function CheckoutPage() {
     };
 
     setPlacing(true);
-
     try {
       const res = await fetch("http://localhost:5000/api/orders", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(orderPayload),
       });
-
       const data = await res.json();
       if (res.ok) {
         clearCart();
@@ -98,7 +109,7 @@ export default function CheckoutPage() {
       } else {
         alert("Order failed: " + data.error);
       }
-    } catch (err) {
+    } catch {
       alert("Something went wrong while placing the order.");
     } finally {
       setPlacing(false);
@@ -106,14 +117,26 @@ export default function CheckoutPage() {
   };
 
   if (loading) {
-    return <div className="text-center py-10 text-gray-500">Loading checkout...</div>;
+    return (
+      <div className="text-center py-10 text-gray-500">Loading checkout...</div>
+    );
   }
 
   return (
     <div className="max-w-4xl mx-auto px-4 py-8 space-y-8">
+      {/* ✅ Show warning popup */}
+      {showWarning && (
+        <div className="fixed top-10 left-1/2 transform -translate-x-1/2 bg-red-100 border border-red-500 text-red-800 px-6 py-4 rounded-md shadow-lg z-50 animate-fade-in">
+          <p className="font-semibold">⚠️ Profile Incomplete</p>
+          <p className="text-sm mt-1">
+            Redirecting to profile to complete your details...
+          </p>
+        </div>
+      )}
+
       <h1 className="text-2xl font-bold text-gray-800">Checkout</h1>
 
-      {/* Address */}
+      {/* Address Section */}
       <div>
         <h2 className="font-semibold mb-2">Select Delivery Address</h2>
         <RadioGroup value={selectedAddress} onChange={setSelectedAddress}>
@@ -121,10 +144,15 @@ export default function CheckoutPage() {
             {addresses.map((addr) => (
               <RadioGroup.Option key={addr.address_id} value={addr.address_id}>
                 {({ checked }) => (
-                  <div className={`p-4 border rounded ${checked ? "border-green-500" : "border-gray-300"}`}>
+                  <div
+                    className={`p-4 border rounded ${
+                      checked ? "border-green-500" : "border-gray-300"
+                    }`}
+                  >
                     <p className="font-medium">{addr.name}</p>
                     <p className="text-sm text-gray-500">
-                      {addr.address_line1}, {addr.city}, {addr.state} - {addr.pincode}
+                      {addr.address_line1}, {addr.city}, {addr.state} -{" "}
+                      {addr.pincode}
                     </p>
                   </div>
                 )}
@@ -134,16 +162,24 @@ export default function CheckoutPage() {
         </RadioGroup>
       </div>
 
-      {/* Slot */}
+      {/* Slot Selection */}
       <div>
         <h2 className="font-semibold mb-2">Select Delivery Date & Time</h2>
-        <Input type="date" value={selectedDate} onChange={(e) => setSelectedDate(e.target.value)} />
+        <Input
+          type="date"
+          value={selectedDate}
+          onChange={(e) => setSelectedDate(e.target.value)}
+        />
         <div className="mt-4 grid grid-cols-2 gap-2">
           {slots.map((slot) => (
             <button
               key={slot.slot_id}
               onClick={() => setSelectedSlot(slot.slot_id)}
-              className={`p-2 border rounded ${selectedSlot === slot.slot_id ? "bg-green-500 text-white" : "border-gray-300"}`}
+              className={`p-2 border rounded ${
+                selectedSlot === slot.slot_id
+                  ? "bg-green-500 text-white"
+                  : "border-gray-300"
+              }`}
             >
               {slot.slot_details}
             </button>
@@ -158,14 +194,22 @@ export default function CheckoutPage() {
           <div className="flex gap-4">
             <RadioGroup.Option value="COD">
               {({ checked }) => (
-                <div className={`px-4 py-2 border rounded ${checked ? "border-green-500" : "border-gray-300"}`}>
+                <div
+                  className={`px-4 py-2 border rounded ${
+                    checked ? "border-green-500" : "border-gray-300"
+                  }`}
+                >
                   Cash on Delivery
                 </div>
               )}
             </RadioGroup.Option>
             <RadioGroup.Option value="Razorpay">
               {({ checked }) => (
-                <div className={`px-4 py-2 border rounded ${checked ? "border-green-500" : "border-gray-300"}`}>
+                <div
+                  className={`px-4 py-2 border rounded ${
+                    checked ? "border-green-500" : "border-gray-300"
+                  }`}
+                >
                   Razorpay (Coming Soon)
                 </div>
               )}
@@ -180,7 +224,9 @@ export default function CheckoutPage() {
         <ul className="space-y-2">
           {cart.items.map((item) => (
             <li key={item.id} className="flex justify-between">
-              <span>{item.name} × {item.quantity || 1}</span>
+              <span>
+                {item.name} × {item.quantity || 1}
+              </span>
               <span>₹{(item.price || 0) * (item.quantity || 1)}</span>
             </li>
           ))}
@@ -191,7 +237,11 @@ export default function CheckoutPage() {
         </div>
       </div>
 
-      <Button className="bg-green-600 text-white w-full" onClick={handlePlaceOrder} disabled={placing}>
+      <Button
+        className="bg-green-600 text-white w-full"
+        onClick={handlePlaceOrder}
+        disabled={placing}
+      >
         {placing ? "Placing Order..." : "Place Order"}
       </Button>
     </div>

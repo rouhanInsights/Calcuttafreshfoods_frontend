@@ -1,73 +1,128 @@
-"use client";
+'use client'
 
-import { createContext, useContext, useEffect, useState } from "react";
-import { jwtDecode } from "jwt-decode";
-import { useRouter } from "next/navigation";
+import {
+  createContext,
+  useContext,
+  useEffect,
+  useState,
+  ReactNode,
+  useCallback,
+} from 'react'
+import { useRouter } from 'next/navigation'
+import { jwtDecode } from 'jwt-decode'
+import { useCart } from '@/context/CartContext'
 
-type User = {
-  user_id: number;
-  name?: string;
-  phone?: string;
-  email?: string;
-  [key: string]: any;
-};
+// Token structure
+interface DecodedToken {
+  userId: number
+  phone: string
+  exp: number
+  iat: number
+}
 
-type AuthContextType = {
-  user: User | null;
-  token: string | null;
-  loading: boolean;
-  login: (token: string, user: User) => void;
-  logout: () => void;
-  refreshToggle: boolean; 
-};
+// User Profile type
+interface User {
+  user_id: number
+  name: string
+  phone: string
+  email: string
+  profile_image_url?: string
+}
 
-const AuthContext = createContext<AuthContextType | undefined>(undefined);
+// Context type
+interface AuthContextType {
+  token: string | null
+  user: User | null
+  login: (token: string) => void
+  logout: () => void
+  loading: boolean
+}
 
-export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
-  const [refreshToggle, setRefreshToggle] = useState(false);
-  const [user, setUser] = useState<User | null>(null);
-  const [token, setToken] = useState<string | null>(null);
-  const [loading, setLoading] = useState(true); // 🆕
-  const router = useRouter();
+const AuthContext = createContext<AuthContextType>({
+  token: null,
+  user: null,
+  login: () => {},
+  logout: () => {},
+  loading: true,
+})
 
+interface AuthProviderProps {
+  children: ReactNode
+}
+
+export const AuthProvider = ({ children }: AuthProviderProps) => {
+  const [token, setToken] = useState<string | null>(null)
+  const [user, setUser] = useState<User | null>(null)
+  const [loading, setLoading] = useState<boolean>(true)
+
+  const router = useRouter()
+  const { clearCart } = useCart()
+
+  // ✅ Memoized logout
+  const logout = useCallback(() => {
+    localStorage.removeItem('token')
+    setToken(null)
+    setUser(null)
+    clearCart()
+    router.push('/')
+  }, [clearCart, router])
+
+  // ✅ Memoized fetchUser
+  const fetchUser = useCallback(
+    async (token: string) => {
+      try {
+        const res = await fetch('http://localhost:5000/api/users/profile', {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        })
+
+        if (res.ok) {
+          const data = await res.json()
+          setUser(data)
+        } else {
+          logout()
+        }
+      } catch {
+        logout()
+      }
+    },
+    [logout]
+  )
+
+  // ✅ Initial token check
   useEffect(() => {
-    const storedToken = localStorage.getItem("token");
-    const storedUser = localStorage.getItem("user");
-  
-    if (storedToken && storedUser) {
-      setToken(storedToken);
-      setUser(JSON.parse(storedUser));
+    const storedToken = localStorage.getItem('token')
+    if (storedToken) {
+      try {
+        const decoded = jwtDecode<DecodedToken>(storedToken)
+        if (decoded.exp * 1000 < Date.now()) {
+          logout()
+        } else {
+          setToken(storedToken)
+          fetchUser(storedToken)
+        }
+      } catch {
+        logout()
+      }
     }
+    setLoading(false)
+  }, [fetchUser, logout])
 
-    setLoading(false); // ✅ Always stop loading after mount
-  }, []);
-
-  const login = (token: string, user: User) => {
-    localStorage.setItem("token", token);
-    localStorage.setItem("user", JSON.stringify(user));
-    setToken(token);
-    setUser(user);
-    setRefreshToggle(prev => !prev); // 🔁 force re-render
-  };
-
-  const logout = () => {
-    localStorage.removeItem("token");
-    localStorage.removeItem("user");
-    setToken(null);
-    setUser(null);
-    setRefreshToggle(prev => !prev); // 🔁 force re-render
-    router.push("/login");
-  };
+  // ✅ Login
+  const login = (newToken: string) => {
+    localStorage.setItem('token', newToken)
+    setToken(newToken)
+    fetchUser(newToken)
+  }
 
   return (
-    <AuthContext.Provider value={{ user, token, loading, login, logout, refreshToggle }}>
+    <AuthContext.Provider
+      value={{ token, user, login, logout, loading }}
+    >
       {children}
     </AuthContext.Provider>
-  );
-};
+  )
+}
 
-export const useAuth = () => {
-  const context = useContext(AuthContext);
-  if (!context) throw new Error("useAuth must be used within AuthProvider");
-  return context;
-};
+export const useAuth = () => useContext(AuthContext)
