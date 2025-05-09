@@ -21,7 +21,7 @@ export default function AllProductsPage() {
   if (!products.length) return <p className="text-gray-500 p-4">Loading products...</p>;
 
   return (
-    <section className="py-8 px-4 min-h-screen bg-white">
+    <section className="py-4 px-4 min-h-screen bg-white">
       <h1 className="text-2xl font-bold mb-6 text-center">All Products</h1>
       <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
         {products.map((product) => (

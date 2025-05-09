@@ -4,15 +4,16 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { useAuth } from '@/context/AuthContext'
+import { useAuth } from "@/context/AuthContext";
 
 export default function OtpScreen() {
   const [otp, setOtp] = useState("");
   const [verifying, setVerifying] = useState(false);
   const [error, setError] = useState("");
   const router = useRouter();
-  const { login } = useAuth(); 
-  const identifier = typeof window !== "undefined" ? localStorage.getItem("temp_user") : "";
+  const { login } = useAuth();
+  const identifier =
+    typeof window !== "undefined" ? localStorage.getItem("temp_user") : "";
 
   useEffect(() => {
     if (!identifier) router.push("/");
@@ -37,7 +38,6 @@ export default function OtpScreen() {
 
       if (res.ok) {
         localStorage.setItem("token", data.token);
-        // localStorage.setItem("user", JSON.stringify(data.user));
         login(data.token);
         localStorage.removeItem("temp_user");
         router.push("/profile");
@@ -52,17 +52,28 @@ export default function OtpScreen() {
   };
 
   return (
-    <div className="max-w-md mx-auto p-6 mt-12 bg-white shadow rounded-md space-y-4">
-      <h2 className="text-xl font-bold text-gray-700">Enter OTP</h2>
-      <Input
-        placeholder="Enter 6-digit OTP"
-        value={otp}
-        onChange={(e) => setOtp(e.target.value)}
-      />
-      {error && <p className="text-sm text-red-500">{error}</p>}
-      <Button onClick={handleVerifyOtp} disabled={verifying || otp.length !== 6}>
-        {verifying ? "Verifying..." : "Verify OTP"}
-      </Button>
+    <div className="min-h-screen bg-gradient-to-br from-[#f5f8ed] to-[#ecf4e2] flex items-center justify-center">
+      <div className="bg-white/60 backdrop-blur-md shadow-xl rounded-xl p-8 w-full max-w-md space-y-5 border border-[#e5eed6]">
+        <h2 className="text-2xl font-bold text-center text-gray-800">
+          Enter OTP
+        </h2>
+        <input
+          type="text"
+          placeholder="Enter 6-digit OTP"
+          value={otp}
+          onChange={(e) => setOtp(e.target.value)}
+          maxLength={6}
+          className="w-full px-4 py-2 rounded-md border border-gray-300 focus:outline-none focus:ring-2 focus:ring-[#8BAD2B] bg-white/80 placeholder-gray-500 text-sm tracking-widest text-center"
+        />
+        {error && <p className="text-sm text-red-500">{error}</p>}
+        <Button
+          onClick={handleVerifyOtp}
+          disabled={verifying || otp.length !== 6}
+          className="w-full bg-[#8BAD2B] hover:bg-[#779624]"
+        >
+          {verifying ? "Verifying..." : "Verify OTP"}
+        </Button>
+      </div>
     </div>
   );
 }

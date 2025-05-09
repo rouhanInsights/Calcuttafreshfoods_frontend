@@ -6,7 +6,9 @@ import { ProductCard } from "./ProductCard";
 type Product = {
   id: string;
   name: string;
+  description?: string;
   price: number;
+  sale_price?: number;
   image: string;
   weight?: string;
   discount?: number;
@@ -24,9 +26,11 @@ export const ProductSlider = ({ products }: ProductSliderProps) => {
           <ProductCard
             id={product.id}
             name={product.name}
+            description={product.description}
             price={product.price}
+            sale_price={product.sale_price}
             image={product.image}
-            weight={product.weight ?? ""}
+            weight={product.weight}
             discount={product.discount}
           />
         </div>

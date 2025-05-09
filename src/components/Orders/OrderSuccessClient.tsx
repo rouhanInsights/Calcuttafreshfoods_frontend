@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
+import { useAuth } from "@/context/AuthContext";
 import { Button } from "@/components/ui/button";
 
 // ✅ Define Order Type
@@ -28,25 +29,36 @@ type Order = {
   items: OrderItem[];
 };
 
-export default function OrderSuccessPage() {
+export default function OrderSuccessClient() {
   const searchParams = useSearchParams();
   const router = useRouter();
+  const { token } = useAuth();
   const orderId = searchParams.get("order_id");
 
   const [order, setOrder] = useState<Order | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    if (orderId) {
-      fetch(`http://localhost:5000/api/orders/${orderId}`)
-        .then((res) => res.json())
-        .then((data) => {
-          setOrder(data);
-          setLoading(false);
-        })
-        .catch(() => setLoading(false));
-    }
-  }, [orderId]);
+    if (!orderId || !token) return;
+
+    fetch(`http://localhost:5000/api/orders/${orderId}`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    })
+      .then((res) => {
+        if (!res.ok) throw new Error("Failed to fetch order");
+        return res.json();
+      })
+      .then((data) => {
+        setOrder(data);
+      })
+      .catch((err) => {
+        console.error("Fetch error:", err.message);
+        setOrder(null);
+      })
+      .finally(() => setLoading(false));
+  }, [orderId, token]);
 
   if (loading) {
     return <div className="text-center py-20">Loading order details...</div>;
@@ -59,7 +71,9 @@ export default function OrderSuccessPage() {
   return (
     <div className="max-w-3xl mx-auto px-4 py-10 space-y-8">
       <h1 className="text-3xl font-bold text-green-600">🎉 Thank you for your order!</h1>
-      <p className="text-gray-700">Your order ID is <strong>#{order.order_id}</strong>. A confirmation email will be sent shortly.</p>
+      <p className="text-gray-700">
+        Your order ID is <strong>#{order.order_id}</strong>. A confirmation email will be sent shortly.
+      </p>
 
       {/* Order Summary */}
       <div className="bg-gray-50 p-6 rounded-md shadow-sm">
@@ -78,7 +92,7 @@ export default function OrderSuccessPage() {
         </div>
       </div>
 
-      {/* Delivery Details */}
+      {/* Delivery Address */}
       <div className="bg-gray-50 p-6 rounded-md shadow-sm">
         <h2 className="text-xl font-semibold mb-4">Delivery Address</h2>
         <p className="text-sm text-gray-700">

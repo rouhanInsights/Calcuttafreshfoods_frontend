@@ -33,6 +33,11 @@
 .animate-fade-in {
   animation: fade-in 0.5s ease-out;
 }
+.sonner-toast {
+  background-color: white !important;
+  backdrop-filter: none !important;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
 :root {
   --sidebar: hsl(0 0% 98%);
   --sidebar-foreground: hsl(240 5.3% 26.1%);

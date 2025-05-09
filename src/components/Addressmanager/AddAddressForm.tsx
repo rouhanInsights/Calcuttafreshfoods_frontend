@@ -1,14 +1,22 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 
 type Props = {
   onSuccess: () => void;
+  onCancel?: () => void;
+  mode?: "add" | "edit";
+  initialData?: Partial<Record<string, any>>;
 };
 
-export default function AddAddressForm({ onSuccess }: Props) {
+export default function AddAddressForm({
+  onSuccess,
+  onCancel,
+  mode = "add",
+  initialData = {},
+}: Props) {
   const [form, setForm] = useState({
     name: "",
     phone: "",
@@ -24,11 +32,22 @@ export default function AddAddressForm({ onSuccess }: Props) {
 
   const [loading, setLoading] = useState(false);
 
+  useEffect(() => {
+    if (mode === "edit" && initialData) {
+      setForm((prev) => ({
+        ...prev,
+        ...initialData,
+      }));
+    }
+  }, [initialData, mode]);
+
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
   ) => {
     const target = e.target as HTMLInputElement;
-    const { name, value, type, checked } = target;
+    const { name, value, type } = target;
+    const checked = target.checked;
+
     setForm((prev) => ({
       ...prev,
       [name]: type === "checkbox" ? checked : value,
@@ -41,9 +60,13 @@ export default function AddAddressForm({ onSuccess }: Props) {
 
     try {
       const token = localStorage.getItem("token");
+      const endpoint =
+        mode === "edit"
+          ? `http://localhost:5000/api/users/addresses/${initialData.address_id}`
+          : "http://localhost:5000/api/users/addresses";
 
-      const res = await fetch("http://localhost:5000/api/users/addresses", {
-        method: "POST",
+      const res = await fetch(endpoint, {
+        method: mode === "edit" ? "PUT" : "POST",
         headers: {
           "Content-Type": "application/json",
           Authorization: `Bearer ${token}`,
@@ -55,20 +78,22 @@ export default function AddAddressForm({ onSuccess }: Props) {
 
       if (res.ok) {
         onSuccess();
-        setForm({
-          name: "",
-          phone: "",
-          address_line1: "",
-          address_line2: "",
-          city: "",
-          state: "",
-          pincode: "",
-          is_default: false,
-          floor_no: "",
-          landmark: "",
-        });
+        if (mode === "add") {
+          setForm({
+            name: "",
+            phone: "",
+            address_line1: "",
+            address_line2: "",
+            city: "",
+            state: "",
+            pincode: "",
+            is_default: false,
+            floor_no: "",
+            landmark: "",
+          });
+        }
       } else {
-        alert("Add failed: " + data.error);
+        alert(`${mode === "edit" ? "Update" : "Add"} failed: ` + data.error);
       }
     } catch {
       alert("Something went wrong");
@@ -78,80 +103,115 @@ export default function AddAddressForm({ onSuccess }: Props) {
   };
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-3">
-      <Input
-        name="name"
-        value={form.name}
-        onChange={handleChange}
-        placeholder="Name"
-        required
-      />
-      <Input
-        name="phone"
-        value={form.phone}
-        onChange={handleChange}
-        placeholder="Phone"
-        required
-      />
-      <Input
-        name="address_line1"
-        value={form.address_line1}
-        onChange={handleChange}
-        placeholder="Address Line 1"
-        required
-      />
-      <Input
-        name="address_line2"
-        value={form.address_line2}
-        onChange={handleChange}
-        placeholder="Address Line 2"
-      />
-      <Input
-        name="city"
-        value={form.city}
-        onChange={handleChange}
-        placeholder="City"
-        required
-      />
-      <Input
-        name="state"
-        value={form.state}
-        onChange={handleChange}
-        placeholder="State"
-        required
-      />
-      <Input
-        name="pincode"
-        value={form.pincode}
-        onChange={handleChange}
-        placeholder="Pincode"
-        required
-      />
-      <Input
-        name="floor_no"
-        value={form.floor_no}
-        onChange={handleChange}
-        placeholder="Floor No. (Optional)"
-      />
-      <Input
-        name="landmark"
-        value={form.landmark}
-        onChange={handleChange}
-        placeholder="Landmark (Optional)"
-      />
-      <label className="flex items-center gap-2">
+    <form
+      onSubmit={handleSubmit}
+      className="bg-white rounded-xl shadow-md p-6 space-y-6 ring-1 ring-gray-100 border-l-[4px] border-l-[#8BAD2B]"
+    >
+      <h3 className="text-lg font-semibold text-gray-800">
+        {mode === "edit" ? "Edit Address" : "Add New Address"}
+      </h3>
+
+      <div className="grid sm:grid-cols-2 gap-4">
+        <input
+          name="name"
+          value={form.name}
+          onChange={handleChange}
+          placeholder="Full Name"
+          required
+          className="px-4 py-2 border rounded-md bg-gray-50 focus:ring-2 focus:ring-[#8BAD2B] focus:outline-none"
+        />
+        <input
+          name="phone"
+          value={form.phone}
+          onChange={handleChange}
+          placeholder="Phone"
+          required
+          className="px-4 py-2 border rounded-md bg-gray-50 focus:ring-2 focus:ring-[#8BAD2B] focus:outline-none"
+        />
+        <input
+          name="address_line1"
+          value={form.address_line1}
+          onChange={handleChange}
+          placeholder="Address Line 1"
+          required
+          className="px-4 py-2 border rounded-md bg-gray-50 focus:ring-2 focus:ring-[#8BAD2B] focus:outline-none"
+        />
+        <input
+          name="address_line2"
+          value={form.address_line2}
+          onChange={handleChange}
+          placeholder="Address Line 2"
+          className="px-4 py-2 border rounded-md bg-gray-50 focus:ring-2 focus:ring-[#8BAD2B] focus:outline-none"
+        />
+        <input
+          name="city"
+          value={form.city}
+          onChange={handleChange}
+          placeholder="City"
+          required
+          className="px-4 py-2 border rounded-md bg-gray-50 focus:ring-2 focus:ring-[#8BAD2B] focus:outline-none"
+        />
+        <input
+          name="state"
+          value={form.state}
+          onChange={handleChange}
+          placeholder="State"
+          required
+          className="px-4 py-2 border rounded-md bg-gray-50 focus:ring-2 focus:ring-[#8BAD2B] focus:outline-none"
+        />
+        <input
+          name="pincode"
+          value={form.pincode}
+          onChange={handleChange}
+          placeholder="Pincode"
+          required
+          className="px-4 py-2 border rounded-md bg-gray-50 focus:ring-2 focus:ring-[#8BAD2B] focus:outline-none"
+        />
+        <input
+          name="floor_no"
+          value={form.floor_no}
+          onChange={handleChange}
+          placeholder="Floor No. (Optional)"
+          className="px-4 py-2 border rounded-md bg-gray-50 focus:ring-2 focus:ring-[#8BAD2B] focus:outline-none"
+        />
+        <input
+          name="landmark"
+          value={form.landmark}
+          onChange={handleChange}
+          placeholder="Landmark (Optional)"
+          className="px-4 py-2 border rounded-md bg-gray-50 focus:ring-2 focus:ring-[#8BAD2B] focus:outline-none sm:col-span-2"
+        />
+      </div>
+
+      <div className="flex items-center gap-2 text-sm">
         <input
           type="checkbox"
           name="is_default"
           checked={form.is_default}
           onChange={handleChange}
+          className="w-4 h-4 accent-[#8BAD2B]"
         />
-        Make Default Address
-      </label>
+        <span className="text-gray-700">Set as default address</span>
+      </div>
 
-      <Button type="submit" disabled={loading}>
-        {loading ? "Saving..." : "Add Address"}
-      </Button>
+      <div className="flex gap-4">
+        <Button
+          type="submit"
+          disabled={loading}
+          className="bg-[#8BAD2B] text-white hover:bg-[#779624] px-6"
+        >
+          {loading
+            ? "Saving..."
+            : mode === "edit"
+            ? "Save Changes"
+            : "Add Address"}
+        </Button>
+        {onCancel && (
+          <Button type="button" variant="outline" onClick={onCancel}>
+            Cancel
+          </Button>
+        )}
+      </div>
     </form>
   );
 }

@@ -1,29 +1,5 @@
-"use client";
-
-import { useAuth } from "@/context/AuthContext";
-import { useRouter } from "next/navigation";
-import { useEffect } from "react";
-import ProfileForm from "@/components/Profile/ProfileForm";
-import { AddressManager } from "@/components/Addressmanager/AddressManager";
+import ProfilePageWrapper from "@/components/Profile/ProfilePageWrapper";
 
 export default function ProfilePage() {
-  const { user, loading } = useAuth();
-  const router = useRouter();
-
-  useEffect(() => {
-    if (!loading && !user) {
-      router.push("/profile");
-    }
-  }, [user, loading, router]);
-
-  if (loading) {
-    return <div className="text-center py-10 text-gray-500">Loading...</div>;
-  }
-
-  return (
-    <div className="space-y-10">
-      <ProfileForm />
-      <AddressManager />
-    </div>
-  );
+  return <ProfilePageWrapper />;
 }

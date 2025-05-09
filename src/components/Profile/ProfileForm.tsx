@@ -1,183 +1,331 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
+import { useForm } from "react-hook-form";
+import { z } from "zod";
+import { zodResolver } from "@hookform/resolvers/zod";
 import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
+import { toast } from "sonner";
+import { useAuth } from "@/context/AuthContext";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import {
+  User,
+  Mail,
+  AtSign,
+  Phone,
+  Smartphone,
+  Calendar,
+} from "lucide-react";
+import { format } from "date-fns";
+
+const profileSchema = z.object({
+  name: z.string().min(2),
+  email: z.string().email(),
+  alt_email: z.string().optional().or(z.literal("")),
+  phone: z.string().min(10),
+  alt_phone: z.string().optional().or(z.literal("")),
+  gender: z.enum(["male", "female", "other"]),
+  dob: z.string(),
+  profile_image: z.string().optional(),
+});
+
+type ProfileFormValues = z.infer<typeof profileSchema>;
 
 export default function ProfileForm() {
-  const [form, setForm] = useState({
-    name: "",
-    phone: "",
-    alt_phone: "",
-    email: "",
-    alt_email: "",
-    gender: "",
-    dob: "",
-    profile_image_url: "",
+  const { token } = useAuth();
+  const [isLoading, setIsLoading] = useState(false);
+  const [avatarPreview, setAvatarPreview] = useState<string>("");
+
+  const form = useForm<ProfileFormValues>({
+    resolver: zodResolver(profileSchema),
+    defaultValues: {
+      name: "",
+      email: "",
+      alt_email: "",
+      phone: "",
+      alt_phone: "",
+      gender: "male",
+      dob: "",
+      profile_image: "",
+    },
   });
 
-  const [loading, setLoading] = useState(false);
-  const [successMsg, setSuccessMsg] = useState("");
-  const [errorMsg, setErrorMsg] = useState("");
-
   useEffect(() => {
-    const fetchProfile = async () => {
-      try {
-        const res = await fetch("http://localhost:5000/api/users/profile", {
-          headers: {
-            Authorization: `Bearer ${localStorage.getItem("token")}`,
-          },
+    if (!token) return;
+
+    fetch("http://localhost:5000/api/users/profile", {
+      headers: { Authorization: `Bearer ${token}` },
+    })
+      .then((res) => res.json())
+      .then((data) => {
+        form.reset({
+          name: data.name ?? "",
+          email: data.email ?? "",
+          alt_email: data.alt_email ?? "",
+          phone: data.phone ?? "",
+          alt_phone: data.alt_phone ?? "",
+          gender: data.gender ?? "male",
+          dob: data.dob ? format(new Date(data.dob), "yyyy-MM-dd") : "",
+          profile_image: data.profile_image_url ?? "",
         });
-        const data = await res.json();
+        if (data.profile_image_url) setAvatarPreview(data.profile_image_url);
+      })
+      .catch((err) => console.error("Profile fetch failed:", err));
+  }, [token]);
 
-        if (res.ok) {
-          setForm({
-            name: data.name || "",
-            phone: data.phone || "",
-            alt_phone: data.alt_phone || "",
-            email: data.email || "",
-            alt_email: data.alt_email || "",
-            gender: data.gender || "",
-            dob: data.dob ? data.dob.split("T")[0] : "",
-            profile_image_url: data.profile_image_url || "",
-          });
-        } else {
-          setErrorMsg("Failed to load profile.");
-        }
-      } catch {
-        setErrorMsg("Error fetching profile.");
-      }
-    };
-
-    fetchProfile();
-  }, []);
-
-  const handleChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
-  ) => {
-    setForm({ ...form, [e.target.name]: e.target.value });
+  const handleAvatarChange = () => {
+    toast("The feature is currently unavailable", {
+      description: "Please wait for the next update.",
+      duration: 3000,
+      icon: "⚠️",
+      action: {
+        label: "Got it",
+        onClick: () => toast.dismiss(),
+      },
+    });
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setLoading(true);
-    setSuccessMsg("");
-    setErrorMsg("");
+  const onSubmit = async (data: ProfileFormValues) => {
+    if (!token) return;
+    setIsLoading(true);
+
+    const sanitizedData = {
+      ...data,
+      alt_email: data.alt_email?.trim() || null,
+      alt_phone: data.alt_phone?.trim() || null,
+    };
 
     try {
       const res = await fetch("http://localhost:5000/api/users/profile", {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
-          Authorization: `Bearer ${localStorage.getItem("token")}`,
+          Authorization: `Bearer ${token}`,
         },
-        body: JSON.stringify(form),
+        body: JSON.stringify(sanitizedData),
       });
 
-      const data = await res.json();
-      if (res.ok) {
-        setSuccessMsg("✅ Profile updated successfully!");
-        setForm({
-          name: data.user.name || "",
-          phone: data.user.phone || "",
-          alt_phone: data.user.alt_phone || "",
-          email: data.user.email || "",
-          alt_email: data.user.alt_email || "",
-          gender: data.user.gender || "",
-          dob: data.user.dob ? data.user.dob.split("T")[0] : "",
-          profile_image_url: data.user.profile_image_url || "",
-        });
-      } else {
-        setErrorMsg("Update failed: " + (data.error || "Unknown error"));
-      }
-    } catch {
-      setErrorMsg("Something went wrong!");
+      if (!res.ok) throw new Error("Failed to update profile");
+
+      toast.success("Profile updated successfully");
+    } catch (err) {
+      toast.error("❌ Update failed", {
+        description: (err as Error).message,
+      });
     } finally {
-      setLoading(false);
+      setIsLoading(false);
     }
   };
 
+  const initials =
+    form
+      .watch("name")
+      ?.split(" ")
+      .map((n) => n[0])
+      .join("") || "U";
+
   return (
-    <form
-      onSubmit={handleSubmit}
-      className="bg-white shadow rounded-lg p-6 space-y-6"
-    >
-      <h2 className="text-xl font-semibold text-gray-700">My Profile</h2>
+    <div className="space-y-8 rounded-xl pt-6 ">
+      <div className="text-xl font-semibold text-gray-800">Personal Information</div>
 
-      {errorMsg && <p className="text-red-600">{errorMsg}</p>}
-      {successMsg && <p className="text-green-600">{successMsg}</p>}
+      <div className="flex flex-col sm:flex-row gap-6 bg-white p-6 sm:p-8 rounded-2xl border-gray-100 transition-all">
+        {/* Avatar Section */}
+        <div className="flex flex-col items-center gap-3">
+          <Avatar className="w-24 h-24 border-4 border-[#8BAD2B]/30 shadow">
+            <AvatarImage src={avatarPreview || ""} />
+            <AvatarFallback className="bg-[#8BAD2B] text-xl text-white">
+              {initials}
+            </AvatarFallback>
+          </Avatar>
+          <Label
+            htmlFor="avatar"
+            onClick={handleAvatarChange}
+            className="cursor-pointer text-sm px-3 py-1 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-md transition-colors"
+          >
+            Change Photo
+          </Label>
+        </div>
 
-      <div className="grid md:grid-cols-2 gap-4">
-        <Input
-          name="name"
-          value={form.name}
-          onChange={handleChange}
-          placeholder="Full Name"
-          required
-        />
-        <Input
-          name="phone"
-          value={form.phone}
-          onChange={handleChange}
-          placeholder="Phone Number"
-          required
-        />
-        <Input
-          name="alt_phone"
-          value={form.alt_phone}
-          onChange={handleChange}
-          placeholder="Alternate Phone (Optional)"
-        />
-        <Input
-          name="email"
-          value={form.email}
-          onChange={handleChange}
-          placeholder="Email"
-          required
-        />
-        <Input
-          name="alt_email"
-          value={form.alt_email}
-          onChange={handleChange}
-          placeholder="Alternate Email (Optional)"
-        />
+        {/* Form Section */}
+        <Form {...form}>
+          <form
+            onSubmit={form.handleSubmit(onSubmit)}
+            className="flex-1 space-y-6"
+          >
+            <FormField
+              control={form.control}
+              name="name"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Full Name</FormLabel>
+                  <FormControl>
+                    <div className="relative">
+                      <User className="absolute left-3 top-2.5 h-5 w-5 text-gray-400" />
+                      <Input
+                        className="pl-10 rounded-md border-gray-300 focus:ring-2 focus:ring-[#8BAD2B]/30"
+                        {...field}
+                      />
+                    </div>
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
 
-        <select
-          name="gender"
-          value={form.gender}
-          onChange={handleChange}
-          className="border border-gray-300 rounded-md px-4 py-2"
-        >
-          <option value="">Select Gender</option>
-          <option value="Male">Male</option>
-          <option value="Female">Female</option>
-          <option value="Other">Other</option>
-        </select>
+            <div className="grid sm:grid-cols-2 gap-4">
+              <FormField
+                control={form.control}
+                name="email"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Primary Email</FormLabel>
+                    <FormControl>
+                      <div className="relative">
+                        <Mail className="absolute left-3 top-2.5 h-5 w-5 text-gray-400" />
+                        <Input
+                          className="pl-10 rounded-md border-gray-300 focus:ring-2 focus:ring-[#8BAD2B]/30"
+                          {...field}
+                        />
+                      </div>
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="alt_email"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Alternate Email</FormLabel>
+                    <FormControl>
+                      <div className="relative">
+                        <AtSign className="absolute left-3 top-2.5 h-5 w-5 text-gray-400" />
+                        <Input
+                          className="pl-10 rounded-md border-gray-300 focus:ring-2 focus:ring-[#8BAD2B]/30"
+                          {...field}
+                        />
+                      </div>
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </div>
 
-        <Input
-          type="date"
-          name="dob"
-          value={form.dob}
-          onChange={handleChange}
-          placeholder="Date of Birth"
-        />
-        <Input
-          name="profile_image_url"
-          value={form.profile_image_url}
-          onChange={handleChange}
-          placeholder="Profile Image URL (optional)"
-        />
+            <div className="grid sm:grid-cols-2 gap-4">
+              <FormField
+                control={form.control}
+                name="phone"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Primary Phone</FormLabel>
+                    <FormControl>
+                      <div className="relative">
+                        <Phone className="absolute left-3 top-2.5 h-5 w-5 text-gray-400" />
+                        <Input
+                          className="pl-10 rounded-md border-gray-300 focus:ring-2 focus:ring-[#8BAD2B]/30"
+                          {...field}
+                        />
+                      </div>
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="alt_phone"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Alternate Phone</FormLabel>
+                    <FormControl>
+                      <div className="relative">
+                        <Smartphone className="absolute left-3 top-2.5 h-5 w-5 text-gray-400" />
+                        <Input
+                          className="pl-10 rounded-md border-gray-300 focus:ring-2 focus:ring-[#8BAD2B]/30"
+                          {...field}
+                        />
+                      </div>
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </div>
+
+            <div className="grid sm:grid-cols-2 gap-4">
+              <FormField
+                control={form.control}
+                name="gender"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Gender</FormLabel>
+                    <Select onValueChange={field.onChange} value={field.value}>
+                      <FormControl>
+                        <SelectTrigger className="w-full rounded-md border-gray-300 focus:ring-2 focus:ring-[#8BAD2B]/30">
+                          <SelectValue placeholder="Select gender" />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent side="top" className="bg-white">
+                        <SelectItem value="male">Male</SelectItem>
+                        <SelectItem value="female">Female</SelectItem>
+                        <SelectItem value="other">Other</SelectItem>
+                      </SelectContent>
+                    </Select>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="dob"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Date of Birth</FormLabel>
+                    <FormControl>
+                      <div className="relative">
+                        <Calendar className="absolute left-3 top-2.5 h-5 w-5 text-gray-400" />
+                        <Input
+                          type="date"
+                          className="pl-10 rounded-md border-gray-300 focus:ring-2 focus:ring-[#8BAD2B]/30"
+                          {...field}
+                        />
+                      </div>
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </div>
+
+            <Button
+              type="submit"
+              className="bg-[#8BAD2B] text-white hover:bg-[#779624] w-full sm:w-auto"
+              disabled={isLoading}
+            >
+              {isLoading ? "Saving..." : "Save Changes"}
+            </Button>
+          </form>
+        </Form>
       </div>
-
-      <div className="flex justify-between items-center">
-        <Button
-          type="submit"
-          className="bg-green-600 text-white"
-          disabled={loading}
-        >
-          {loading ? "Saving..." : "Update Profile"}
-        </Button>
-      </div>
-    </form>
+    </div>
   );
 }
