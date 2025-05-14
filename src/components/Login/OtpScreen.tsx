@@ -57,7 +57,7 @@ export default function OtpScreen() {
         <h2 className="text-2xl font-bold text-center text-gray-800">
           Enter OTP
         </h2>
-        <input
+        <Input
           type="text"
           placeholder="Enter 6-digit OTP"
           value={otp}

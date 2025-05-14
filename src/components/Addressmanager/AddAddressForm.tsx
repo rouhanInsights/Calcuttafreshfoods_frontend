@@ -4,11 +4,24 @@ import { useEffect, useState } from "react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 
+type AddressForm = {
+  name: string;
+  phone: string;
+  address_line1: string;
+  address_line2: string;
+  city: string;
+  state: string;
+  pincode: string;
+  is_default: boolean;
+  floor_no: string;
+  landmark: string;
+};
+
 type Props = {
   onSuccess: () => void;
   onCancel?: () => void;
   mode?: "add" | "edit";
-  initialData?: Partial<Record<string, any>>;
+  initialData?: Partial<AddressForm & { address_id: number }>;
 };
 
 export default function AddAddressForm({
@@ -17,7 +30,7 @@ export default function AddAddressForm({
   mode = "add",
   initialData = {},
 }: Props) {
-  const [form, setForm] = useState({
+  const [form, setForm] = useState<AddressForm>({
     name: "",
     phone: "",
     address_line1: "",
@@ -112,7 +125,7 @@ export default function AddAddressForm({
       </h3>
 
       <div className="grid sm:grid-cols-2 gap-4">
-        <input
+        <Input
           name="name"
           value={form.name}
           onChange={handleChange}
@@ -120,7 +133,7 @@ export default function AddAddressForm({
           required
           className="px-4 py-2 border rounded-md bg-gray-50 focus:ring-2 focus:ring-[#8BAD2B] focus:outline-none"
         />
-        <input
+        <Input
           name="phone"
           value={form.phone}
           onChange={handleChange}
@@ -128,7 +141,7 @@ export default function AddAddressForm({
           required
           className="px-4 py-2 border rounded-md bg-gray-50 focus:ring-2 focus:ring-[#8BAD2B] focus:outline-none"
         />
-        <input
+        <Input
           name="address_line1"
           value={form.address_line1}
           onChange={handleChange}
@@ -136,14 +149,14 @@ export default function AddAddressForm({
           required
           className="px-4 py-2 border rounded-md bg-gray-50 focus:ring-2 focus:ring-[#8BAD2B] focus:outline-none"
         />
-        <input
+        <Input
           name="address_line2"
           value={form.address_line2}
           onChange={handleChange}
           placeholder="Address Line 2"
           className="px-4 py-2 border rounded-md bg-gray-50 focus:ring-2 focus:ring-[#8BAD2B] focus:outline-none"
         />
-        <input
+        <Input
           name="city"
           value={form.city}
           onChange={handleChange}
@@ -151,7 +164,7 @@ export default function AddAddressForm({
           required
           className="px-4 py-2 border rounded-md bg-gray-50 focus:ring-2 focus:ring-[#8BAD2B] focus:outline-none"
         />
-        <input
+        <Input
           name="state"
           value={form.state}
           onChange={handleChange}
@@ -159,7 +172,7 @@ export default function AddAddressForm({
           required
           className="px-4 py-2 border rounded-md bg-gray-50 focus:ring-2 focus:ring-[#8BAD2B] focus:outline-none"
         />
-        <input
+        <Input
           name="pincode"
           value={form.pincode}
           onChange={handleChange}
@@ -167,14 +180,14 @@ export default function AddAddressForm({
           required
           className="px-4 py-2 border rounded-md bg-gray-50 focus:ring-2 focus:ring-[#8BAD2B] focus:outline-none"
         />
-        <input
+        <Input
           name="floor_no"
           value={form.floor_no}
           onChange={handleChange}
           placeholder="Floor No. (Optional)"
           className="px-4 py-2 border rounded-md bg-gray-50 focus:ring-2 focus:ring-[#8BAD2B] focus:outline-none"
         />
-        <input
+        <Input
           name="landmark"
           value={form.landmark}
           onChange={handleChange}
@@ -184,7 +197,7 @@ export default function AddAddressForm({
       </div>
 
       <div className="flex items-center gap-2 text-sm">
-        <input
+        <Input
           type="checkbox"
           name="is_default"
           checked={form.is_default}

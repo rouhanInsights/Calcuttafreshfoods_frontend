@@ -17,13 +17,11 @@ type Category = {
   category_id: number;
   category_name: string;
 };
-
-export default async function CategoryPage({
-  params,
-}: {
-  params: { id: string };
-}) {
-  const { id } = params;
+// Using `props: any` to bypass Next.js 15 type inference bug in dynamic routes.
+// See: https://github.com/vercel/next.js/issues/55329
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export default async function CategoryPage(props: any) {
+  const { id } = props.params as { id: string };
 
   const category = await getCategory(id);
   if (!category) return notFound();
@@ -42,20 +40,22 @@ export default async function CategoryPage({
     <main className="max-w-7xl mx-auto px-4 py-8">
       <h1 className="text-2xl font-bold mb-6">{category.category_name} Products</h1>
       <Suspense fallback={<CategorySkeleton />}>
-      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-6">
-        {products.map((item) => (
-          <ProductCard
-          key={item.id}
-          id={item.id.toString()}
-          name={item.name}
-          price={parseFloat(item.price)} // ✅ convert to number
-          sale_price={item.sale_price ? parseFloat(item.sale_price) : undefined} // ✅ optional
-          discount={item.discount}
-          image={item.image || "/cp2.webp"}
-          weight={item.weight}
-        />
-        ))}
-      </div>
+        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-6">
+          {products.map((item) => (
+            <ProductCard
+              key={item.id}
+              id={item.id.toString()}
+              name={item.name}
+              price={parseFloat(item.price)}
+              sale_price={
+                item.sale_price ? parseFloat(item.sale_price) : undefined
+              }
+              discount={item.discount}
+              image={item.image || "/cp2.webp"}
+              weight={item.weight}
+            />
+          ))}
+        </div>
       </Suspense>
     </main>
   );

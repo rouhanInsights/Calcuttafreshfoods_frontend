@@ -47,7 +47,7 @@ export default function LoginScreen() {
         <h2 className="text-2xl font-bold text-center text-gray-800">
           🔐 Login with OTP
         </h2>
-        <input
+        <Input
           type="text"
           placeholder="Phone or Email"
           value={identifier}

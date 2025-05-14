@@ -62,7 +62,6 @@ const contentMap: Record<string, HeroContent> = {
 
 export default function HeroSection() {
   const [currentIndex, setCurrentIndex] = useState(0);
-  const { user } = useAuth();
   const { token } = useAuth();
   const [greeting, setGreeting] = useState("");
   const goNext = () => {
@@ -173,7 +172,7 @@ export default function HeroSection() {
       </div>
 
       {/* Navigation Buttons */}
-      {/* <button
+      <button
         aria-label="Previous slide"
         onClick={goPrev}
         className="absolute left-4 top-1/2 transform -translate-y-1/2 bg-black/40 hover:bg-black/60 text-white p-2 rounded-full z-10"
@@ -187,7 +186,7 @@ export default function HeroSection() {
         className="absolute right-4 top-1/2 transform -translate-y-1/2 bg-black/40 hover:bg-black/60 text-white p-2 rounded-full z-10"
       >
         <FaChevronRight size={20} />
-      </button> */}
+      </button>
 
       {/* Diagonal Divider */}
       <div

@@ -5,6 +5,7 @@ import { useAuth } from "@/context/AuthContext";
 import { Button } from "@/components/ui/button";
 import { useRouter } from "next/navigation";
 import { format } from "date-fns";
+import Image from "next/image";
 
 type OrderItem = {
   product_id: number;
@@ -90,7 +91,9 @@ export default function OrdersPage() {
                 key={item.product_id}
                 className="flex items-center gap-4 border rounded-lg p-3"
               >
-                <img
+                <Image
+                width={200}
+                height={100}
                   src={item.image_url}
                   alt={item.name}
                   className="w-16 h-16 rounded-md object-cover border"

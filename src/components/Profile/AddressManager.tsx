@@ -92,7 +92,7 @@ export const AddressManager = () => {
       });
   
       const allData = await fetchRes.json();
-      const current = allData.find((a: any) => a.address_id === id);
+      const current = allData.find((a: Address) => a.address_id === id);
   
       if (!current) return toast.error("Address not found");
   
@@ -118,7 +118,7 @@ export const AddressManager = () => {
         toast.error("Failed: " + data.error);
       }
     } catch (err) {
-      toast.error("Error updating address");
+       toast.error("Error updating address: " + (err as Error).message);
     }
   };
   

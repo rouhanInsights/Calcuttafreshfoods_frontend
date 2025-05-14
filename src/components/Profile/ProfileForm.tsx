@@ -88,7 +88,7 @@ export default function ProfileForm() {
         if (data.profile_image_url) setAvatarPreview(data.profile_image_url);
       })
       .catch((err) => console.error("Profile fetch failed:", err));
-  }, [token]);
+  }, [token, form]);
 
   const handleAvatarChange = () => {
     toast("The feature is currently unavailable", {

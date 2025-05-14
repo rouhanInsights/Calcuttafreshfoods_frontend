@@ -4,6 +4,17 @@
 //   return res.json();
 // }
 
+type ProductFromAPI = {
+  id: number;
+  name: string;
+  description: string;
+  price: string;
+  sale_price?: string;
+  image: string;
+  weight: string;
+  discount?: string;
+  stock_quantity?: number;
+};
 
 export async function fetchAllProducts() {
   const res = await fetch("http://localhost:5000/api/products", { cache: "no-store" });
@@ -11,7 +22,7 @@ export async function fetchAllProducts() {
 
   const data = await res.json();
 
-  return data.map((item: any) => ({
+  return data.map((item: ProductFromAPI) => ({
     id: item.id,
     name: item.name,
     description: item.description,

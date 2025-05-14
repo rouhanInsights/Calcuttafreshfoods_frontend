@@ -5,60 +5,58 @@ import { useEffect, useState } from "react";
 import { useParams } from "next/navigation";
 import Image from "next/image";
 import { Plus, Minus } from "lucide-react";
-
+type Product = {
+  name: string;
+  image: string;
+  price: string;
+  sale_price?: string;
+  weight?: string;
+  description?: string;
+  discount?: string;
+};
 export default function ProductDetailPage() {
   const params = useParams();
   const id = params?.id as string; // ✅ cast to string
-
   const { addToCart, removeFromCart, cart } = useCart();
   const quantity = cart.items.find((item) => item.id === id)?.quantity || 0;
-
-  const [product, setProduct] = useState<any>(null);
+  
+  const [product, setProduct] = useState<Product | null>(null);
   const [loading, setLoading] = useState(true);
-
+  
   useEffect(() => {
     if (id) {
       fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/products/${id}`)
-        .then((res) => res.json())
-        .then((data) => {
-          setProduct(data);
-          setLoading(false);
-        })
-        .catch((err) => {
-          console.error("Fetch error:", err);
-          setLoading(false);
-        });
+      .then((res) => res.json())
+      .then((data) => {
+        setProduct(data);
+        setLoading(false);
+      })
+      .catch((err) => {
+        console.error("Fetch error:", err);
+        setLoading(false);
+      });
     }
   }, [id]);
-
+  
+  if (typeof id !== "string") {
+    return <p className="p-4 text-red-500">Invalid product ID</p>;
+  }
   if (loading) return <p className="p-4">Loading...</p>;
   if (!product) return <p className="p-4 text-red-500">Product not found</p>;
 
-  const {
-    name,
-    image,
-    price,
-    sale_price,
-    weight,
-    description,
-    discount,
-  } = product;
+  const { name, image, price, sale_price, weight, description, discount } =
+    product;
 
-  const displayPrice = parseFloat(sale_price) || parseFloat(price);
+  const displayPrice = parseFloat(sale_price ?? price);
   const originalPrice = sale_price ? parseFloat(price) : null;
-  const discountValue = parseInt(discount, 10);
+  const discountValue = parseInt(discount ?? "0", 10);
 
   return (
     <section className="p-6 max-w-5xl mx-auto bg-white rounded-xl shadow-md mt-8">
       <div className="grid md:grid-cols-2 gap-8 items-start">
         {/* Image Block */}
         <div className="relative w-full h-[400px] bg-gray-100 rounded-lg overflow-hidden">
-          <Image
-            src={image}
-            alt={name}
-            fill
-            className="object-contain p-4"
-          />
+          <Image src={image} alt={name} fill className="object-contain p-4" />
           {discountValue > 0 && (
             <span className="absolute top-3 left-3 bg-red-600 text-white text-xs font-semibold px-2 py-1 rounded-full shadow">
               {discountValue}% OFF
