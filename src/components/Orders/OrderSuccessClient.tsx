@@ -86,6 +86,10 @@ export default function OrderSuccessClient() {
             </li>
           ))}
         </ul>
+        <div className="flex justify-between text-sm mb-2 mt-2">
+        <span>Delivery Charges:</span>
+        <span className="text-green-700 font-semibold">₹30</span>
+      </div>
         <div className="mt-4 flex justify-between font-bold">
           <span>Total</span>
           <span>₹{Number(order.total_price).toFixed(2)}</span>

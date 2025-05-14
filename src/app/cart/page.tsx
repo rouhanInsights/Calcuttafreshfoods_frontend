@@ -22,6 +22,9 @@ export default function Page() {
     (total, item) => total + (item.quantity ?? 1),
     0
   );
+  const deliveryCharges = 30;
+  // const deliveryCharges = subtotal > 500 ? 0 : deliverCharges;
+  const totalAmount = subtotal + deliveryCharges;
 
   if (!items.length) {
     return (
@@ -33,8 +36,12 @@ export default function Page() {
           height={160}
           className="mx-auto mb-4"
         />
-        <h2 className="text-xl font-semibold text-gray-700 mb-2">Your cart is empty</h2>
-        <p className="text-sm text-gray-500 mb-6">Looks like you haven’t added anything yet.</p>
+        <h2 className="text-xl font-semibold text-gray-700 mb-2">
+          Your cart is empty
+        </h2>
+        <p className="text-sm text-gray-500 mb-6">
+          Looks like you haven’t added anything yet.
+        </p>
         <Link href="/">
           <Button className="bg-green-600 text-white hover:bg-green-700">
             Browse Products
@@ -55,7 +62,10 @@ export default function Page() {
             const showMRP = item.sale_price && item.sale_price < item.price;
 
             return (
-              <div key={item.id} className="bg-white p-4 rounded-lg shadow flex gap-4">
+              <div
+                key={item.id}
+                className="bg-white p-4 rounded-lg shadow flex gap-4"
+              >
                 <div className="relative w-24 h-24 bg-gray-100 rounded overflow-hidden">
                   <Image
                     src={item.image}
@@ -71,7 +81,9 @@ export default function Page() {
                 </div>
 
                 <div className="flex-1">
-                  <h3 className="text-md font-semibold text-gray-800">{item.name}</h3>
+                  <h3 className="text-md font-semibold text-gray-800">
+                    {item.name}
+                  </h3>
                   <p className="text-sm text-gray-500">{item.weight}</p>
 
                   <div className="mt-2 flex items-center gap-2">
@@ -137,15 +149,19 @@ export default function Page() {
             <span>{totalItems}</span>
           </div>
           <div className="flex justify-between text-sm mb-4">
+            <span>Delivery Charges:</span>
+            <span className="font-semibold text-green-700">
+              ₹{deliveryCharges}
+            </span>
+          </div>
+          <div className="flex justify-between text-sm mb-4">
             <span>Subtotal:</span>
-            <span className="font-semibold text-green-700">₹{subtotal.toFixed(2)}</span>
+            <span className="font-semibold text-green-700">
+              ₹{totalAmount.toFixed(2)}
+            </span>
           </div>
           <div className="flex gap-3">
-            <Button
-              variant="outline"
-              className="flex-1"
-              onClick={clearCart}
-            >
+            <Button variant="outline" className="flex-1" onClick={clearCart}>
               Clear Cart
             </Button>
             <Button

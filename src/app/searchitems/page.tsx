@@ -28,6 +28,7 @@ export default async function SearchPage({
     }
   );
 
+  
   if (!res.ok) return notFound();
 
   const products: Product[] = await res.json();

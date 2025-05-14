@@ -10,6 +10,7 @@ type HeroContent = {
 };
 
 import { useAuth } from "@/context/AuthContext";
+import Link from "next/link";
 const images = [
   "hero-bg1.webp",
   "hero-bg2.webp",
@@ -143,14 +144,14 @@ export default function HeroSection() {
             </p>
 
             {/* Floating animated Button */}
-            <Button
+            <Link href="/products/all"><Button
               onClick={handleScrollToOffers}
               size="lg"
               className="bg-[#81991f] hover:bg-[#6fa31e] text-white px-8 py-6 text-lg transition-transform hover:scale-105 animate-float"
             >
               <FiShoppingCart />
               Shop Now
-            </Button>
+            </Button></Link>
 
             <p className="mt-4 text-white font-medium">
               *Got a question? We&aposre here to help — +91 123456 7890
@@ -172,7 +173,7 @@ export default function HeroSection() {
       </div>
 
       {/* Navigation Buttons */}
-      <button
+      {/* <button
         aria-label="Previous slide"
         onClick={goPrev}
         className="absolute left-4 top-1/2 transform -translate-y-1/2 bg-black/40 hover:bg-black/60 text-white p-2 rounded-full z-10"
@@ -186,7 +187,7 @@ export default function HeroSection() {
         className="absolute right-4 top-1/2 transform -translate-y-1/2 bg-black/40 hover:bg-black/60 text-white p-2 rounded-full z-10"
       >
         <FaChevronRight size={20} />
-      </button>
+      </button> */}
 
       {/* Diagonal Divider */}
       <div
