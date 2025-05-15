@@ -33,7 +33,7 @@ export const AddressManager = () => {
 
   const fetchAddresses = async () => {
     try {
-      const res = await fetch("http://localhost:5000/api/users/addresses", {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/users/addresses`, {
         headers: {
           Authorization: `Bearer ${localStorage.getItem("token")}`,
         },
@@ -57,7 +57,7 @@ export const AddressManager = () => {
         onClick: async () => {
           try {
             const res = await fetch(
-              `http://localhost:5000/api/users/addresses/${id}`,
+              `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/users/addresses/${id}`,
               {
                 method: "DELETE",
                 headers: {
@@ -85,7 +85,7 @@ export const AddressManager = () => {
       const token = localStorage.getItem("token");
   
       // 1. Fetch full address data first
-      const fetchRes = await fetch(`http://localhost:5000/api/users/addresses`, {
+      const fetchRes = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/users/addresses`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
@@ -97,7 +97,7 @@ export const AddressManager = () => {
       if (!current) return toast.error("Address not found");
   
       // 2. Submit full data with only is_default = true
-      const res = await fetch(`http://localhost:5000/api/users/addresses/${id}`, {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/users/addresses/${id}`, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",

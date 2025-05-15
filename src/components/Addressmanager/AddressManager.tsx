@@ -25,7 +25,7 @@ export const AddressManager = () => {
 
   const fetchAddresses = async () => {
     try {
-      const res = await fetch("http://localhost:5000/api/users/addresses", {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/users/addresses`, {
         headers: {
           Authorization: `Bearer ${localStorage.getItem("token")}`,
         },
@@ -47,7 +47,7 @@ export const AddressManager = () => {
 
     try {
       const res = await fetch(
-        `http://localhost:5000/api/users/addresses/${id}`,
+        `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/users/addresses/${id}`,
         {
           method: "DELETE",
           headers: {

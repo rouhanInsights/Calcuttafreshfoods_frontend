@@ -3,7 +3,7 @@ export async function fetchCategories() {
     //   const res = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/categories`, {
     //     cache: "no-store",
     //   });
-    const res = await fetch("http://localhost:5000/api/categories", 
+    const res = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/categories`,  
         { cache: "no-store",
          });
       if (!res.ok) {

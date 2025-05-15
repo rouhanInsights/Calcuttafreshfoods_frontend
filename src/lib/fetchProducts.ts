@@ -17,7 +17,7 @@ type ProductFromAPI = {
 };
 
 export async function fetchAllProducts() {
-  const res = await fetch("http://localhost:5000/api/products", { cache: "no-store" });
+  const res = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/products`, { cache: "no-store" });
   if (!res.ok) throw new Error("Failed to fetch products");
 
   const data = await res.json();

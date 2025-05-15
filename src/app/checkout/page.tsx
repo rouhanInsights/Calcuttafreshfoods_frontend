@@ -63,7 +63,7 @@ const handlePlaceOrder = async () => {
 
   try {
     setLoading(true);
-    const res = await fetch("http://localhost:5000/api/orders", {
+    const res = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/orders`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",

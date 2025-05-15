@@ -24,7 +24,7 @@ export default function CheckoutForm({
   const [slots, setSlots] = useState<Slot[]>([]);
 
   useEffect(() => {
-    fetch("http://localhost:5000/api/slots")
+    fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/slots`)
       .then((res) => res.json())
       .then((data) => setSlots(data))
       .catch((err) => {

@@ -27,7 +27,7 @@ export default function AddressSelector({ selected, onChange }: Props) {
   useEffect(() => {
     if (!token) return;
 
-    fetch("http://localhost:5000/api/users/addresses", {
+   fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/users/addresses`, {
       headers: {
         Authorization: `Bearer ${token}`,
       },

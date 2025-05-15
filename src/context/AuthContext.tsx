@@ -71,7 +71,7 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
   const fetchUser = useCallback(
     async (token: string) => {
       try {
-        const res = await fetch('http://localhost:5000/api/users/profile', {
+        const res = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/users/profile`, {
           headers: {
             Authorization: `Bearer ${token}`,
           },

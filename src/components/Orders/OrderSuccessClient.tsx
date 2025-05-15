@@ -41,7 +41,7 @@ export default function OrderSuccessClient() {
   useEffect(() => {
     if (!orderId || !token) return;
 
-    fetch(`http://localhost:5000/api/orders/${orderId}`, {
+    fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/orders/${orderId}`, {
       headers: {
         Authorization: `Bearer ${token}`,
       },
@@ -111,7 +111,7 @@ export default function OrderSuccessClient() {
         <Button
           className="bg-green-600 text-white"
           onClick={() =>
-            window.open(`http://localhost:5000/api/orders/${order.order_id}/invoice`, "_blank")
+            window.open(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/orders/${order.order_id}/invoice`, "_blank")
           }
         >
           📄 Download Invoice

@@ -75,8 +75,8 @@ export default function AddAddressForm({
       const token = localStorage.getItem("token");
       const endpoint =
         mode === "edit"
-          ? `http://localhost:5000/api/users/addresses/${initialData.address_id}`
-          : "http://localhost:5000/api/users/addresses";
+          ? `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/users/addresses/${initialData.address_id}`
+          : `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/users/addresses`;
 
       const res = await fetch(endpoint, {
         method: mode === "edit" ? "PUT" : "POST",
