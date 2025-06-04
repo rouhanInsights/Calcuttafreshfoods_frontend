@@ -44,7 +44,7 @@ type Product = {
 export const Navbar = () => {
   const router = useRouter();
   const { cart } = useCart();
-  const { user, token, logout } = useAuth();
+  const { user, token, logout, loading } = useAuth();
 
   const [mounted, setMounted] = useState(false);
   const [categories, setCategories] = useState<Category[]>([]);
@@ -246,64 +246,67 @@ export const Navbar = () => {
           </Link>
 
           {/* Profile or Login */}
-          {token && user ? (
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <div className="flex items-center gap-2 cursor-pointer px-2 py-1 border border-gray-300 rounded-full hover:shadow-sm">
-                  <Avatar className="h-8 w-8">
-                    <AvatarImage
-                      src={user.profile_image_url || "/images/user.png"}
-                      alt="User"
-                    />
-                    <AvatarFallback>
-                      {user.name?.[0]?.toUpperCase() || "UI"}
-                    </AvatarFallback>
-                  </Avatar>
-                  <span className="text-sm font-medium text-gray-700 hidden md:inline">
-                    Profile
-                  </span>
-                </div>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent
-                className="w-46 py-2 bg-white border border-gray-200 shadow-lg rounded-md"
-                align="end"
-              >
-                <div className="px-3 py-1.5 text-sm text-muted-foreground font-medium">
-                  My Account
-                </div>
-                <DropdownMenuSeparator className="my-2 h-px bg-gray-300" />
-                <DropdownMenuItem asChild>
-                  <Link
-                    href="/profile"
-                    className="flex items-center gap-2 px-3 py-2 rounded-md transition hover:bg-gray-100 cursor-pointer"
-                  >
-                    <User className="w-4 h-4" /> Profile
-                  </Link>
-                </DropdownMenuItem>
-                <DropdownMenuItem asChild>
-                  <Link
-                    href="/myorder"
-                    className="flex items-center gap-2 px-3 py-2 rounded-md transition hover:bg-gray-100 cursor-pointer"
-                  >
-                    <ClipboardList className="w-4 h-4" /> My Orders
-                  </Link>
-                </DropdownMenuItem>
-                <DropdownMenuSeparator className="my-2 h-px bg-gray-200" />
-                <DropdownMenuItem
-                  onClick={logout}
-                  className="flex items-center gap-2 px-3 py-2 rounded-md transition hover:bg-red-50 text-red-600 cursor-pointer"
+          {!loading &&
+            (token && user ? (
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <div className="flex items-center gap-2 cursor-pointer px-2 py-1 border border-gray-300 rounded-full hover:shadow-sm">
+                    <Avatar className="h-8 w-8">
+                      <AvatarImage
+                        src={user.profile_image_url || "/images/user.png"}
+                        alt="User"
+                      />
+                      <AvatarFallback>
+                        {user.name?.[0]?.toUpperCase() || "UI"}
+                      </AvatarFallback>
+                    </Avatar>
+                    <span className="text-sm font-medium text-gray-700 hidden md:inline">
+                      Profile
+                    </span>
+                  </div>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent
+                  className="w-46 py-2 bg-white border border-gray-200 shadow-lg rounded-md"
+                  align="end"
                 >
-                  <LogOut className="w-4 h-4" /> Logout
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
-          ) : (
-            <Link href="/login">
-              <Button style={{ backgroundColor: "#81991f", color: "#ffffff" }}>
-                Login
-              </Button>
-            </Link>
-          )}
+                  <div className="px-3 py-1.5 text-sm text-muted-foreground font-medium">
+                    My Account
+                  </div>
+                  <DropdownMenuSeparator className="my-2 h-px bg-gray-300" />
+                  <DropdownMenuItem asChild>
+                    <Link
+                      href="/profile"
+                      className="flex items-center gap-2 px-3 py-2 rounded-md transition hover:bg-gray-100 cursor-pointer"
+                    >
+                      <User className="w-4 h-4" /> Profile
+                    </Link>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem asChild>
+                    <Link
+                      href="/myorder"
+                      className="flex items-center gap-2 px-3 py-2 rounded-md transition hover:bg-gray-100 cursor-pointer"
+                    >
+                      <ClipboardList className="w-4 h-4" /> My Orders
+                    </Link>
+                  </DropdownMenuItem>
+                  <DropdownMenuSeparator className="my-2 h-px bg-gray-200" />
+                  <DropdownMenuItem
+                    onClick={logout}
+                    className="flex items-center gap-2 px-3 py-2 rounded-md transition hover:bg-red-50 text-red-600 cursor-pointer"
+                  >
+                    <LogOut className="w-4 h-4" /> Logout
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            ) : (
+              <Link href="/login">
+                <Button
+                  style={{ backgroundColor: "#81991f", color: "#ffffff" }}
+                >
+                  Login
+                </Button>
+              </Link>
+            ))}
         </div>
       </div>
     </header>

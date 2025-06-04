@@ -12,11 +12,14 @@ export default function OtpScreen() {
   const [error, setError] = useState("");
   const router = useRouter();
   const { login } = useAuth();
+
   const identifier =
     typeof window !== "undefined" ? localStorage.getItem("temp_user") : "";
 
   useEffect(() => {
-    if (!identifier) router.push("/");
+    if (!identifier) {
+      router.push("/");
+    }
   }, [identifier, router]);
 
   const handleVerifyOtp = async () => {
@@ -24,28 +27,31 @@ export default function OtpScreen() {
     setError("");
 
     try {
-      const res = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/users/verify-otp`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(
-          identifier?.includes("@")
-            ? { email: identifier, otp }
-            : { phone: identifier, otp }
-        ),
-      });
+      const res = await fetch(
+        `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/users/verify-otp`,
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(
+            identifier?.includes("@")
+              ? { email: identifier, otp }
+              : { phone: identifier, otp }
+          ),
+        }
+      );
 
       const data = await res.json();
 
       if (res.ok) {
         localStorage.setItem("token", data.token);
-        login(data.token);
+        login(data.token); // AuthContext login
         localStorage.removeItem("temp_user");
-        router.push("/profile");
+        router.push("/");
       } else {
         setError(data.error || "Invalid OTP.");
       }
-    } catch {
-      setError("Network error.");
+    } catch (err) {
+      setError("Network error. Please try again.");
     } finally {
       setVerifying(false);
     }
@@ -57,6 +63,7 @@ export default function OtpScreen() {
         <h2 className="text-2xl font-bold text-center text-gray-800">
           Enter OTP
         </h2>
+
         <Input
           type="text"
           placeholder="Enter 6-digit OTP"
@@ -65,7 +72,9 @@ export default function OtpScreen() {
           maxLength={6}
           className="w-full px-4 py-2 rounded-md border border-gray-300 focus:outline-none focus:ring-2 focus:ring-[#8BAD2B] bg-white/80 placeholder-gray-500 text-sm tracking-widest text-center"
         />
-        {error && <p className="text-sm text-red-500">{error}</p>}
+
+        {error && <p className="text-sm text-red-500 text-center">{error}</p>}
+
         <Button
           onClick={handleVerifyOtp}
           disabled={verifying || otp.length !== 6}
