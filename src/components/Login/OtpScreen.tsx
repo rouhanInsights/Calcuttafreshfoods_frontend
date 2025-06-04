@@ -50,7 +50,7 @@ export default function OtpScreen() {
       } else {
         setError(data.error || "Invalid OTP.");
       }
-    } catch (err) {
+    } catch {
       setError("Network error. Please try again.");
     } finally {
       setVerifying(false);
