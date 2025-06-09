@@ -9,6 +9,8 @@ import AddressSelector from "@/components/checkout/AddressSelector";
 import CheckoutForm from "@/components/checkout/CheckoutForm";
 import PaymentOption from "@/components/checkout/PaymentOptions";
 import OrderSummary from "@/components/checkout/OrderSummary";
+import {Button} from "@/components/ui/button";
+import { ChevronRightIcon } from "lucide-react"
 
 export default function CheckoutPage() {
   const { cart, clearCart } = useCart();
@@ -22,25 +24,99 @@ export default function CheckoutPage() {
   const [loading, setLoading] = useState(false);
 
 const handlePlaceOrder = async () => {
-  if (!selectedAddress || !selectedSlot || !selectedDate || !token) {
-    alert("Please complete all fields before placing order.");
+  if (!token) {
+    toast.custom(() => (
+      <div className="bg-gray-50 border border-gray-300 rounded-md px-4 py-2 shadow flex items-start gap-3 text-gray-800 text-sm max-w-sm w-full">
+        <div className="text-xl">🔐</div>
+        <div className="flex-1">
+          <p className="font-semibold">You’re not logged in</p>
+          <p className="text-xs leading-snug mt-0.5">
+            Please  Login to place your order.
+          </p>
+          <Button
+            className="mt-3 bg-blue-600 text-white px-3 py-2 rounded hover:bg-blue-700 transition-colors"
+            onClick={() => router.push("/login")}
+          >
+             LogIn <ChevronRightIcon />  
+          </Button>
+        </div>
+      </div>
+    ));
+    return;
+  }
+  if (!selectedAddress) {
+    toast.custom(() => (
+      <div className="bg-red-50 border border-red-300 rounded-md px-4 py-2 shadow flex items-start gap-3 text-red-900 text-sm max-w-sm w-full">
+        <div className="text-xl">📍</div>
+        <div className="flex-1">
+          <p className="font-semibold">Delivery address missing. .</p>
+          <p className="text-xs leading-snug mt-0.5">
+            Please select or add a delivary address before proceeding
+            </p>
+          <Button variant ={"ghost"}
+            className="mt-3 hover:bg-red-100 border border-red-200 text-red-800 animated fade-in"
+            onClick={() => router.push("/profile")}
+            >Add Address <ChevronRightIcon /></Button>
+        </div>
+      </div>
+    ));
     return;
   }
 
-  // ✅ Local 9 AM validation for same-day delivery
+  if (!selectedSlot) {
+    toast.custom(() => (
+      <div className="bg-yellow-50 border border-yellow-300 rounded-md px-4 py-2 shadow flex items-start gap-3 text-yellow-900 text-sm max-w-sm w-full">
+        <div className="text-xl">⏰</div>
+        <div className="flex-1">
+          <p className="font-semibold">Delivery time not selected</p>
+          <p className="text-xs leading-snug mt-0.5">
+            Please choose a delivery slot to continue.
+          </p>
+        </div>
+      </div>
+    ));
+    return;
+  }
+
+  if (!selectedDate) {
+    toast.custom(() => (
+      <div className="bg-blue-50 border border-blue-300 rounded-md px-4 py-2 shadow flex items-start gap-3 text-blue-900 text-sm max-w-sm w-full">
+        <div className="text-xl">📅</div>
+        <div className="flex-1">
+          <p className="font-semibold">Delivery date missing</p>
+          <p className="text-xs leading-snug mt-0.5">
+            Select a delivery date to place your order.
+          </p>
+        </div>
+      </div>
+    ));
+    return;
+  }
+
+
+  // ✅ Same-day cutoff logic
   const now = new Date();
   const selected = new Date(selectedDate);
-  const isSameDay =
-    now.toDateString() === selected.toDateString();
-
+  const isSameDay = now.toDateString() === selected.toDateString();
   const nineAM = new Date();
   nineAM.setHours(9, 0, 0, 0);
 
   if (isSameDay && now > nineAM) {
-    toast.warning("Same-day delivery is only available before 9:00 AM. Please choose another date.");
+    toast.custom(() => (
+      <div className="bg-orange-50 border border-orange-300 rounded-md px-4 py-2 shadow flex items-start gap-3 text-orange-900 text-sm max-w-sm w-full">
+        <div className="text-xl">⚠️</div>
+        <div className="flex-1">
+          <p className="font-semibold">Same-day delivery cutoff</p>
+          <p className="text-xs leading-snug mt-0.5">
+            Orders for today must be placed before 9:00 AM. Please select a future date.
+          </p>
+        </div>
+      </div>
+    ));
     return;
   }
 
+  // ✅ Prepare order
   const orderItems = cart.items.map((item) => ({
     product_id: item.id,
     quantity: item.quantity ?? 1,
@@ -73,23 +149,27 @@ const handlePlaceOrder = async () => {
     });
 
     const data = await res.json();
-    console.log("Order response:", data);
 
     if (!res.ok) {
-      if (data.cutoff_violation) {
-        alert("❗Same-day delivery cutoff passed. Please select another date.");
-      } else {
-        throw new Error(data.error || "Order placement failed");
-      }
-      return;
+      throw new Error(data?.error || "Order failed");
     }
 
     clearCart();
+    toast.success("✅ Order placed successfully!");
     router.push(`/orders/success?order_id=${data.order_id}`);
   } catch (err) {
-    const message =
-      err instanceof Error ? err.message : "Something went wrong";
-    alert("Error placing order: " + message);
+    const message = err instanceof Error ? err.message : "Something went wrong";
+    toast.custom(() => (
+      <div className="bg-red-50 border border-red-300 rounded-md px-4 py-2 shadow flex items-start gap-3 text-red-900 text-sm max-w-sm w-full">
+        <div className="text-xl">❌</div>
+        <div className="flex-1">
+          <p className="font-semibold">Order failed</p>
+          <p className="text-xs leading-snug mt-0.5">
+            {message}
+          </p>
+        </div>
+      </div>
+    ));
   } finally {
     setLoading(false);
   }
