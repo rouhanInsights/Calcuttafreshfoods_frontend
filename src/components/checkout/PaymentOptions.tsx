@@ -2,7 +2,7 @@
 
 import React from "react";
 import { RadioGroup } from "@headlessui/react";
-
+import { CheckCircle } from "lucide-react";
 type Props = {
   selected: string;
   onChange: (value: string) => void;
@@ -23,23 +23,23 @@ export default function PaymentOption({ selected, onChange }: Props) {
       <RadioGroup value={selected} onChange={onChange} className="grid gap-3">
         {paymentOptions.map((option) => (
           <RadioGroup.Option
-            key={option.value}
-            value={option.value}
-            className={({ checked }) =>
-              `border rounded p-3 cursor-pointer ${
-                checked ? "border-green-600 bg-green-50" : "border-gray-300"
-              }`
-            }
-          >
-            {({ checked }) => (
-              <div className="flex items-center justify-between">
-                <span className="text-sm text-gray-700">{option.label}</span>
-                {checked && (
-                  <span className="text-green-600 text-sm font-medium">✔</span>
-                )}
-              </div>
-            )}
-          </RadioGroup.Option>
+  key={option.value}
+  value={option.value}
+  className={({ checked }) =>
+    `border rounded p-3 cursor-pointer ${
+      checked ? "border-green-600 bg-green-100" : "border-gray-300"
+    }`
+  }
+>
+  {({ checked }) => (
+    <div className="flex items-center justify-between">
+      <span className="text-sm text-black">{option.label}</span>
+      {checked && (
+        <CheckCircle className="text-green-600" size={18} />
+      )}
+    </div>
+  )}
+</RadioGroup.Option>
         ))}
       </RadioGroup>
     </div>

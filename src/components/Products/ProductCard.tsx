@@ -79,38 +79,42 @@ export const ProductCard = ({
     
           {/* Add to Cart / Quantity */}
           <div className="mt-3">
-            {quantity > 0 ? (
-              <div className="flex items-center border border-gray-300 rounded-full overflow-hidden text-sm">
-                <button
-                  onClick={() => removeFromCart(id)}
-                  className="w-8 h-8 bg-gray-50 hover:bg-gray-100 text-gray-700 flex justify-center items-center"
-                >
-                  <Minus size={14} />
-                </button>
-                <span className="w-8 text-center font-medium text-gray-800">
-                  {quantity}
-                </span>
-                <button
-                  onClick={() =>
-                    addToCart({ id, name, price: displayPrice, image, weight })
-                  }
-                  className="w-8 h-8 bg-gray-50 hover:bg-gray-100 text-gray-700 flex justify-center items-center"
-                >
-                  <Plus size={14} />
-                </button>
-              </div>
-            ) : (
-              <button
-                onClick={() =>
-                  addToCart({ id, name, price: displayPrice, image, weight })
-                }
-                className="w-full mt-1 py-2 bg-blue-600 hover:bg-blue-700 text-white text-sm rounded-full flex justify-center items-center transition"
-              >
-                <ShoppingCart size={16} className="mr-1" />
-                Add
-              </button>
-            )}
-          </div>
+  {quantity > 0 ? (
+    <div className="flex justify-center">
+      <div className="flex items-center border border-gray-300 rounded-full overflow-hidden text-sm w-32">
+        <button
+          onClick={() => removeFromCart(id)}
+          className="w-10 h-10 bg-gray-50 hover:bg-gray-100 text-gray-700 flex justify-center items-center"
+        >
+          <Minus size={16} />
+        </button>
+        <span className="flex-1 text-center font-medium text-gray-800">
+          {quantity}
+        </span>
+        <button
+          onClick={() =>
+            addToCart({ id, name, price: displayPrice, image, weight })
+          }
+          className="w-10 h-10 bg-gray-50 hover:bg-gray-100 text-gray-700 flex justify-center items-center"
+        >
+          <Plus size={16} />
+        </button>
+      </div>
+    </div>
+  ) : (
+    <button
+      onClick={() =>
+        addToCart({ id, name, price: displayPrice, image, weight })
+      }
+      className="w-full mt-1 py-2 bg-blue-600 hover:bg-blue-700 text-white text-sm rounded-full flex justify-center items-center transition"
+    >
+      <ShoppingCart size={16} className="mr-1" />
+      Add
+    </button>
+  )}
+</div>
+
+
         </div>
       </div>
     );    
