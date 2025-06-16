@@ -1,9 +1,9 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useCallback } from "react";
 import { useAuth } from "@/context/AuthContext";
 import { RadioGroup } from "@headlessui/react";
-import { CheckCircle, Plus, X } from "lucide-react";
+import { CheckCircle, Plus, X, Pencil, Trash } from "lucide-react";
 import AddAddressForm from "@/components/Addressmanager/AddAddressForm";
 import { Button } from "@/components/ui/button";
 
@@ -27,8 +27,9 @@ export default function AddressSelector({ selected, onChange }: Props) {
   const [addresses, setAddresses] = useState<Address[]>([]);
   const [loading, setLoading] = useState(true);
   const [showForm, setShowForm] = useState(false);
+  const [editAddress, setEditAddress] = useState<Address | null>(null);
 
-  const fetchAddresses = async () => {
+  const fetchAddresses = useCallback(async () => {
     try {
       const res = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/users/addresses`, {
         headers: { Authorization: `Bearer ${token}` },
@@ -42,36 +43,57 @@ export default function AddressSelector({ selected, onChange }: Props) {
     } finally {
       setLoading(false);
     }
+  }, [token]);
+
+  const handleDelete = async (addressId: number) => {
+    try {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/users/addresses/${addressId}`, {
+        method: "DELETE",
+        headers: { Authorization: `Bearer ${token}` },
+      });
+
+      if (res.ok) {
+        setAddresses((prev) => prev.filter((addr) => addr.address_id !== addressId));
+      } else {
+        console.error("Failed to delete address");
+      }
+    } catch (err) {
+      console.error("Error deleting address:", err);
+    }
   };
 
   useEffect(() => {
     if (token) fetchAddresses();
-  }, [token]);
+  }, [token, fetchAddresses]);
 
   if (loading) return <p className="text-gray-500">Loading addresses...</p>;
 
   return (
     <div className="space-y-5">
       <div className="flex justify-between items-center">
-        
         <Button
           variant="outline"
           size="sm"
           className="text-sm"
-          onClick={() => setShowForm(!showForm)}
+          onClick={() => {
+            setShowForm(!showForm);
+            setEditAddress(null);
+          }}
         >
           {showForm ? <X className="w-4 h-4 mr-1" /> : <Plus className="w-4 h-4 mr-1" />}
           {showForm ? "Cancel" : "Add Address"}
         </Button>
       </div>
 
-      {showForm && (
+      {(showForm || editAddress) && (
         <div className="rounded-lg bg-gray-50 border p-5">
           <AddAddressForm
-            mode="add"
+            mode={editAddress ? "edit" : "add"}
+            initialData={editAddress || undefined}
             onSuccess={() => {
               fetchAddresses();
               setShowForm(false);
+              setEditAddress(null);
             }}
           />
         </div>
@@ -92,7 +114,7 @@ export default function AddressSelector({ selected, onChange }: Props) {
                   >
                     {checked && (
                       <div className="absolute top-2 right-2 text-green-600">
-                        <CheckCircle size={30} />
+                        <CheckCircle size={24} />
                       </div>
                     )}
                     <p className="font-medium">{addr.name}</p>
@@ -100,6 +122,26 @@ export default function AddressSelector({ selected, onChange }: Props) {
                       {addr.address_line1}, {addr.city}, {addr.state} - {addr.pincode}
                     </p>
                     <p className="text-xs text-black">Phone: {addr.phone}</p>
+
+                    <div className="absolute bottom-2 right-2 flex space-x-3">
+                      <Pencil
+                        size={22}
+                        className="text-blue-600 cursor-pointer"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setEditAddress(addr);
+                          setShowForm(true);
+                        }}
+                      />
+                      <Trash
+                        size={22}
+                        className="text-red-600 cursor-pointer"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleDelete(addr.address_id);
+                        }}
+                      />
+                    </div>
                   </div>
                 )}
               </RadioGroup.Option>
