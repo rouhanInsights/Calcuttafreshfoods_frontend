@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
-import { FaChevronLeft, FaChevronRight } from "react-icons/fa";
+// import { FaChevronLeft, FaChevronRight } from "react-icons/fa";
 import { Button } from "@/components/ui/button";
 import { FiShoppingCart } from "react-icons/fi";
 type HeroContent = {
@@ -68,9 +68,9 @@ export default function HeroSection() {
     setCurrentIndex((prev) => (prev + 1) % images.length);
   };
 
-  const goPrev = () => {
-    setCurrentIndex((prev) => (prev - 1 + images.length) % images.length);
-  };
+  // const goPrev = () => {
+  //   setCurrentIndex((prev) => (prev - 1 + images.length) % images.length);
+  // };
 
   useEffect(() => {
     const fetchGreeting = async () => {
@@ -153,7 +153,7 @@ export default function HeroSection() {
             </Button></Link>
 
             <p className="mt-4 text-white font-medium">
-              *Got a question? We&aposre here to help — +91 123456 7890
+              *Got a question? We&apos;re here to help — +91 123456 7890
             </p>
 
             {/* Dots Indicator */}
@@ -172,7 +172,7 @@ export default function HeroSection() {
       </div>
 
       {/* Navigation Buttons */}
-      <button
+      {/* <button
         aria-label="Previous slide"
         onClick={goPrev}
         className="absolute left-4 top-1/2 transform -translate-y-1/2 bg-black/40 hover:bg-black/60 text-white p-2 rounded-full z-10"
@@ -186,7 +186,7 @@ export default function HeroSection() {
         className="absolute right-4 top-1/2 transform -translate-y-1/2 bg-black/40 hover:bg-black/60 text-white p-2 rounded-full z-10"
       >
         <FaChevronRight size={20} />
-      </button>
+      </button> */}
 
       {/* Diagonal Divider */}
       <div

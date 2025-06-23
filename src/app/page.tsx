@@ -5,7 +5,7 @@ import HeroSection from "@/components/Herosection/HeroSection";
 import { QuickLinks } from "@/components/QuickLinks/QuickLinks";
 import { CategoryBanner } from "@/components/CategoryGrid/CategoryGrid";
 import { ProductsSection } from "@/components/Products/ProductsSection";
-import { MobileApp } from "@/components/Mobileapp/MobileApp";
+// import { MobileApp } from "@/components/Mobileapp/MobileApp";
 import { fetchAllProducts } from "@/lib/fetchProducts";
 
 type Product = {
@@ -72,7 +72,7 @@ export default function Home() {
       />
 
       <CategoryBanner />
-      <MobileApp />
+      {/* <MobileApp /> */}
     </>
   );
 }
