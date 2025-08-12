@@ -7,11 +7,13 @@ import { Trash, Plus, Minus, ShoppingCart } from "lucide-react";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
 import Link from "next/link";
+import { useAuth } from "@/context/AuthContext";
 
 export default function CartPage() {
   const router = useRouter();
   const { cart, removeFromCart, addToCart, clearCart } = useCart();
   const items = cart.items;
+  const { user } = useAuth();
 
   const subtotal = items.reduce(
     (total, item) => total + item.price * (item.quantity ?? 1),
@@ -174,12 +176,21 @@ export default function CartPage() {
               >
                 Clear Cart
               </Button>
-              <Button
-                className="w-full bg-green-600 hover:bg-green-700 text-white"
-                onClick={() => router.push("/checkout")}
-              >
-                Proceed to Checkout
-              </Button>
+              {user ? (
+                <Button
+                  className="w-full bg-green-600 hover:bg-green-700 text-white"
+                  onClick={() => router.push("/checkout")}
+                >
+                  Proceed to Checkout
+                </Button>
+              ) : (
+                <Button
+                  className="w-full bg-green-500 hover:bg-green-600 text-white"
+                  onClick={() => router.push("/login")}
+                >
+                  Login to Continue
+                </Button>
+              )}
             </div>
           </div>
         </div>

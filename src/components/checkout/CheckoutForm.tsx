@@ -1,7 +1,8 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
-import { Input } from "@/components/ui/input";
+import DatePicker from "react-datepicker";
+import "react-datepicker/dist/react-datepicker.css";
 
 type Slot = {
   slot_id: number;
@@ -15,6 +16,20 @@ type Props = {
   onSlotChange: (slotId: number) => void;
 };
 
+function getNextThreeValidDates(): Date[] {
+  const validDates: Date[] = [];
+  const today = new Date();
+
+  while (validDates.length < 3) {
+    today.setDate(today.getDate() + 1);
+    const next = new Date(today); // clone
+    if (next.getDay() === 1) continue; // skip Monday
+    validDates.push(new Date(next));
+  }
+
+  return validDates;
+}
+
 export default function CheckoutForm({
   date,
   slot,
@@ -22,6 +37,7 @@ export default function CheckoutForm({
   onSlotChange,
 }: Props) {
   const [slots, setSlots] = useState<Slot[]>([]);
+  const [allowedDates, setAllowedDates] = useState<Date[]>([]);
 
   useEffect(() => {
     fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/slots`)
@@ -31,9 +47,9 @@ export default function CheckoutForm({
         console.error("Failed to load slots", err);
         setSlots([]);
       });
-  }, []);
 
-  const today = new Date().toISOString().split("T")[0]; // yyyy-mm-dd
+    setAllowedDates(getNextThreeValidDates());
+  }, []);
 
   return (
     <div className="space-y-4">
@@ -41,12 +57,33 @@ export default function CheckoutForm({
         <label className="block text-sm font-medium text-gray-700 mb-1">
           Select Delivery Date
         </label>
-        <Input
-          type="date"
-          value={date}
-          min={today}
-          onChange={(e) => onDateChange(e.target.value)}
+        <DatePicker
+          selected={date ? new Date(date) : null}
+          onChange={(val: Date | null) => {
+            if (val) {
+              onDateChange(val.toISOString().split("T")[0]);
+            }
+          }}
+          includeDates={allowedDates}
+          placeholderText="Choose a valid date 🗓️"
+          className="w-full border font-bold text-black rounded px-3 py-2 text-sm"
+          dayClassName={(date) => {
+            return date.getDay() === 1 ? "monday-disabled has-tooltip" : "";
+          }}
+          renderDayContents={(day, date) => {
+            if (date.getDay() === 1) {
+              return (
+                <div className="tooltip-wrapper">
+                  {day}
+                </div>
+              );
+            }
+            return day;
+          }}
         />
+        <p className="text-sm text-red-500 mt-1">
+          * Only next 3 delivery days available (Monday we are out of service)
+        </p>
       </div>
 
       <div>

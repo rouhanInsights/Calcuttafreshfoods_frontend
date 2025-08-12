@@ -9,14 +9,18 @@ import "./globals.css";
 import { FloatingCart } from "@/components/FloatingCart/FloatingCart";
 import { AuthProvider } from "@/context/AuthContext";
 import { Toaster } from "@/components/ui/sonner";
+import { LocationProvider } from "@/context/LocationContext";
 export default function RootLayout({ children }: { children: ReactNode }) {
   return (
     <html lang="en">
       <body>
         <CartProvider>
           <AuthProvider>
+            <LocationProvider>
+            <div className="sticky top-0 z-50 bg-white">
+              <Navbar />
+            </div>
             <ProductOfferBanner />
-            <Navbar />
             <main>{children}</main>
             <Toaster
               toastOptions={{
@@ -42,6 +46,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
             />
             <FloatingCart />
             <Footer />
+            </LocationProvider>
           </AuthProvider>
         </CartProvider>
       </body>

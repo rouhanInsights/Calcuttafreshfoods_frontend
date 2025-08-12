@@ -34,3 +34,45 @@ export async function fetchAllProducts() {
     stock_quantity: item.stock_quantity ?? 0,
   }));
 }
+export async function fetchBestSellers() {
+  const res = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/products/best-sellers`, {
+    cache: "no-store",
+  });
+  if (!res.ok) throw new Error("Failed to fetch best sellers");
+
+  const data = await res.json();
+
+  return data.map((item: ProductFromAPI) => ({
+    id: item.id,
+    name: item.name,
+    description: item.description,
+    price: parseFloat(item.price),
+    sale_price: item.sale_price ? parseFloat(item.sale_price) : undefined,
+    image: item.image,
+    weight: item.weight,
+    discount: item.discount ? parseInt(item.discount) : 0,
+    stock_quantity: item.stock_quantity ?? 0,
+  }));
+}
+
+export async function fetchTopOffers() {
+  const res = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/products/top-offers`, {
+    cache: "no-store",
+  });
+
+  if (!res.ok) throw new Error("Failed to fetch top offers");
+
+  const data = await res.json();
+
+  return data.map((item: ProductFromAPI) => ({
+    id: item.id,
+    name: item.name,
+    description: item.description,
+    price: parseFloat(item.price),
+    sale_price: item.sale_price ? parseFloat(item.sale_price) : undefined,
+    image: item.image,
+    weight: item.weight,
+    discount: item.discount ? parseInt(item.discount) : 0,
+    stock_quantity: item.stock_quantity ?? 0,
+  }));
+}

@@ -6,7 +6,11 @@ import { QuickLinks } from "@/components/QuickLinks/QuickLinks";
 import { CategoryBanner } from "@/components/CategoryGrid/CategoryGrid";
 import { ProductsSection } from "@/components/Products/ProductsSection";
 // import { MobileApp } from "@/components/Mobileapp/MobileApp";
-import { fetchAllProducts } from "@/lib/fetchProducts";
+import {
+  fetchAllProducts,
+  fetchTopOffers,
+  fetchBestSellers,
+} from "@/lib/fetchProducts";
 
 type Product = {
   id: string;
@@ -21,54 +25,47 @@ type Product = {
 };
 
 export default function Home() {
-  const [products, setProducts] = useState<Product[]>([]);
+  const [allProducts, setAllProducts] = useState<Product[]>([]);
+  const [topOffers, setTopOffers] = useState<Product[]>([]);
+  const [bestSellers, setBestSellers] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    fetchAllProducts()
-      .then((data) => {
-        setProducts(data);
+    Promise.all([fetchAllProducts(), fetchTopOffers(), fetchBestSellers()])
+      .then(([all, offers, best]) => {
+        setAllProducts(all.slice(0, 6));
+        setTopOffers(offers.slice(0, 6));
+        setBestSellers(best.slice(0, 6));
         setLoading(false);
       })
       .catch((err) => {
-        console.error("Failed to load products:", err);
+        console.error("Failed to load homepage data:", err);
         setLoading(false);
       });
   }, []);
 
   if (loading) return <p className="p-4 text-gray-500">Loading products...</p>;
 
-  const topOffers = products
-    .filter((p) => !isNaN(Number(p.discount)) && Number(p.discount) >= 10)
-    .slice(0, 6);
-
-  const bestSellers = [...products]
-    .sort((a, b) => a.stock_quantity - b.stock_quantity)
-    .slice(0, 6);
-
-  const allProducts = [...products].slice(0, 6);
-
   return (
     <>
       <HeroSection />
       <QuickLinks />
-
       <ProductsSection
-        title="All Products"
-        products={allProducts}
-        viewAllLink="/products/all"
+        title="Top Offers"
+        products={topOffers}
+        viewAllLink="/products/top-offers"
       />
 
       <ProductsSection
         title="Best Sellers"
         products={bestSellers}
-        viewAllLink="/products/bestsellers"
+        viewAllLink="/products/best-sellers"
       />
 
       <ProductsSection
-        title="Top Offers"
-        products={topOffers}
-        viewAllLink="/products/topoffers"
+        title="All Products"
+        products={allProducts}
+        viewAllLink="/products/all"
       />
 
       <CategoryBanner />

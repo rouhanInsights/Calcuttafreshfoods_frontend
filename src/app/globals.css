@@ -79,3 +79,11 @@
     @apply bg-background text-foreground;
   }
 } */
+.monday-disabled {
+  
+  color: #cc0000 !important;
+  pointer-events: none;
+  cursor: not-allowed;
+  border-radius: 6px;
+  position: relative;
+}

@@ -1,0 +1,143 @@
+"use client";
+
+import React, { useEffect, useState } from "react";
+import { Calendar } from "@/components/ui/calendar";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
+import { format } from "date-fns";
+import { cn } from "@/lib/utils";
+import { parse } from "date-fns";
+
+type Slot = {
+  slot_id: number;
+  slot_details: string;
+};
+
+type Props = {
+  date: string;
+  slot: number | null;
+  onDateChange: (val: string) => void;
+  onSlotChange: (slotId: number) => void;
+};
+
+function getNextThreeValidDates(): Date[] {
+  const validDates: Date[] = [];
+  const today = new Date();
+
+  // Clone to avoid mutating 'today'
+  const dateCursor = new Date(today);
+
+  while (validDates.length < 3) {
+    // ✅ Skip Mondays only
+    if (dateCursor.getDay() !== 1) {
+      validDates.push(new Date(dateCursor));
+    }
+
+    // Move to next day
+    dateCursor.setDate(dateCursor.getDate() + 1);
+  }
+
+  return validDates;
+}
+
+export default function CheckoutForm({
+  date,
+  slot,
+  onDateChange,
+  onSlotChange,
+}: Props) {
+  const [slots, setSlots] = useState<Slot[]>([]);
+  const [allowedDates, setAllowedDates] = useState<Date[]>([]);
+  const [calendarOpen, setCalendarOpen] = useState(false);
+
+  const selectedDate = date ? parse(date, "yyyy-MM-dd", new Date()) : null;
+
+  useEffect(() => {
+    fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/slots`)
+      .then((res) => res.json())
+      .then((data) => setSlots(data))
+      .catch((err) => {
+        console.error("Failed to load slots", err);
+        setSlots([]);
+      });
+
+    setAllowedDates(getNextThreeValidDates());
+  }, []);
+
+  return (
+    <div className="space-y-4">
+      <div>
+        <label className="block text-sm font-medium text-gray-700 mb-1">
+          Select Delivery Date
+        </label>
+
+        <Popover open={calendarOpen} onOpenChange={setCalendarOpen}>
+          <PopoverTrigger asChild>
+            <button
+              type="button"
+              className={cn(
+                "w-full text-left font-bold text-black border px-3 py-2 text-sm rounded",
+                !selectedDate && "text-muted-foreground"
+              )}
+            >
+              {selectedDate
+                ? format(selectedDate, "PPP")
+                : "Choose a valid date 🗓️"}
+            </button>
+          </PopoverTrigger>
+
+          <PopoverContent
+            className="w-auto p-0 bg-white border rounded shadow-md"
+            align="start"
+          >
+            <Calendar
+              mode="single"
+              selected={selectedDate ?? undefined}
+              onSelect={(val) => {
+                if (val) {
+                  onDateChange(format(val, "yyyy-MM-dd"));
+                  setCalendarOpen(false);
+                }
+              }}
+              disabled={(date) =>
+                !allowedDates.some(
+                  (d) => d.toDateString() === date.toDateString()
+                )
+              }
+              initialFocus
+            />
+          </PopoverContent>
+        </Popover>
+
+        <p className="text-xs text-gray-500 mt-1">
+          * Only next 3 delivery days available (excluding Mondays)
+        </p>
+      </div>
+
+      <div>
+        <label className="block text-sm font-medium text-gray-700 mb-2">
+          Select Delivery Time Slot
+        </label>
+        <div className="grid grid-cols-2 gap-3">
+          {slots.map((s) => (
+            <button
+              key={s.slot_id}
+              type="button"
+              onClick={() => onSlotChange(s.slot_id)}
+              className={`border px-4 py-2 rounded text-sm text-center ${
+                slot === s.slot_id
+                  ? "bg-green-600 text-white border-green-600"
+                  : "bg-white hover:bg-gray-50 border-gray-300"
+              }`}
+            >
+              {s.slot_details}
+            </button>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+}

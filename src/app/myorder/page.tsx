@@ -4,8 +4,11 @@ import { useEffect, useState } from "react";
 import { useAuth } from "@/context/AuthContext";
 import { Button } from "@/components/ui/button";
 import { useRouter } from "next/navigation";
+import { useCart } from "@/context/CartContext";
 import { format } from "date-fns";
 import Image from "next/image";
+
+import FeedbackModalButton from "@/components/Orders/FeedbackModalButton";
 
 type OrderItem = {
   product_id: number;
@@ -17,7 +20,7 @@ type OrderItem = {
 
 type Order = {
   order_id: number;
-  total_price: string; // ✅ comes as string
+  total_price: string;
   status: string;
   order_date: string;
   items: OrderItem[];
@@ -28,13 +31,28 @@ export default function OrdersPage() {
   const [orders, setOrders] = useState<Order[]>([]);
   const [loading, setLoading] = useState(true);
   const router = useRouter();
+  const { addToCart } = useCart();
+  const handleBuyAgain = (items: OrderItem[]) => {
+    items.forEach((item) => {
+      addToCart({
+        id: item.product_id.toString(),
+        name: item.name,
+        price: item.price,
+        image: item.image_url,
+      });
+    });
+    router.push("/cart");
+  };
 
   useEffect(() => {
     if (!user?.user_id || !token) return;
 
-    fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/orders/user/${user.user_id}`, {
-      headers: { Authorization: `Bearer ${token}` },
-    })
+    fetch(
+      `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/orders/user/${user.user_id}`,
+      {
+        headers: { Authorization: `Bearer ${token}` },
+      }
+    )
       .then((res) => res.json())
       .then((data) => {
         if (Array.isArray(data)) {
@@ -52,11 +70,15 @@ export default function OrdersPage() {
   }, [token, user]);
 
   if (loading) {
-    return <div className="p-8 text-center text-gray-600">Loading orders...</div>;
+    return (
+      <div className="p-8 text-center text-gray-600">Loading orders...</div>
+    );
   }
 
   if (!orders.length) {
-    return <div className="p-8 text-center text-gray-500">No orders found.</div>;
+    return (
+      <div className="p-8 text-center text-gray-500">No orders found.</div>
+    );
   }
 
   return (
@@ -74,7 +96,10 @@ export default function OrdersPage() {
                 Placed on: {format(new Date(order.order_date), "dd MMM yyyy")}
               </p>
               <p className="text-sm capitalize text-gray-600">
-                Status: <span className="font-medium text-green-700">{order.status}</span>
+                Status:{" "}
+                <span className="font-medium text-green-700">
+                  {order.status}
+                </span>
               </p>
             </div>
             <div className="text-right">
@@ -89,44 +114,59 @@ export default function OrdersPage() {
             {order.items.map((item) => (
               <div
                 key={item.product_id}
-                className="flex items-center gap-4 border rounded-lg p-3"
+                className="flex flex-col border rounded-lg p-3 gap-2"
               >
-                <Image
-                width={200}
-                height={100}
-                  src={item.image_url}
-                  alt={item.name}
-                  className="w-16 h-16 rounded-md object-cover border"
-                />
-                <div className="flex-1">
-                  <p className="font-medium text-sm">{item.name}</p>
-                  <p className="text-sm text-gray-500">
-                    Qty: {item.quantity} × ₹{item.price}
-                  </p>
+                <div className="flex items-center gap-4">
+                  <Image
+                    width={200}
+                    height={100}
+                    src={item.image_url}
+                    alt={item.name}
+                    className="w-16 h-16 rounded-md object-cover border"
+                  />
+                  <div className="flex-1">
+                    <p className="font-medium text-sm">{item.name}</p>
+                    <p className="text-sm text-gray-500">
+                      Qty: {item.quantity} × ₹{item.price}
+                    </p>
+                  </div>
                 </div>
               </div>
             ))}
           </div>
 
-          <div className="mt-4 flex justify-end gap-2">
-            <Button
-              variant="outline"
-              onClick={() => router.push(`/orders/success?order_id=${order.order_id}`)}
-              className="border-[#8BAD2B] text-[#8BAD2B] hover:bg-[#f5fdec]"
-            >
-              View Details
-            </Button>
-            <Button
-              variant="outline"
-              onClick={() =>
-                window.open(
-                  `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/orders/${order.order_id}/invoice`,
-                  "_blank"
-                )
-              }
-            >
-              Download Invoice
-            </Button>
+          <div className="mt-4 flex justify-between flex-wrap gap-2 items-center">
+            <FeedbackModalButton token={token!} orderId={order.order_id} />
+
+            <div className="flex gap-2">
+              <Button
+                variant="default"
+                onClick={() => handleBuyAgain(order.items)}
+                className="bg-[#8BAD2B] text-white hover:bg-[#74901d]"
+              >
+                Buy Again
+              </Button>
+              <Button
+                variant="outline"
+                onClick={() =>
+                  router.push(`/orders/success?order_id=${order.order_id}`)
+                }
+                className="border-[#8BAD2B] text-[#8BAD2B] hover:bg-[#f5fdec]"
+              >
+                View Details
+              </Button>
+              <Button
+                variant="outline"
+                onClick={() =>
+                  window.open(
+                    `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/orders/${order.order_id}/invoice`,
+                    "_blank"
+                  )
+                }
+              >
+                Download Invoice
+              </Button>
+            </div>
           </div>
         </div>
       ))}
