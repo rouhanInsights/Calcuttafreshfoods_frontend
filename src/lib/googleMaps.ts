@@ -1,7 +1,7 @@
 // lib/googleMaps.ts
 "use client";
-import * as React from "react";
-
+import { useEffect, useState } from "react";
+import { Library, Loader } from "@googlemaps/js-api-loader";
 // use a module-level constant so the default array is STABLE across renders
 export const DEFAULT_LIBS = ["places"] as const;
 
@@ -48,18 +48,23 @@ export function loadGoogleMaps(libraries: ReadonlyArray<string> = DEFAULT_LIBS) 
   return loaderPromise;
 }
 
-export function useGoogleMaps(libraries: ReadonlyArray<string> = DEFAULT_LIBS) {
-  const [ready, setReady] = React.useState(false);
+export function useGoogleMaps(libraries: string[] = []) {
+  const [ready, setReady] = useState(false);
 
-  // ✅ include `libraries` directly; since DEFAULT_LIBS is stable, no infinite loops
-  React.useEffect(() => {
-    let alive = true;
-    loadGoogleMaps(libraries)
-      .then(() => alive && setReady(true))
-      .catch(() => alive && setReady(false));
-    return () => {
-      alive = false;
-    };
+  useEffect(() => {
+    const loader = new Loader({
+      apiKey: process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY!,
+      version: "weekly",
+      libraries: libraries as Library[], // ✅ Fix: Type assertion
+    });
+
+    loader
+      .load()
+      .then(() => setReady(true))
+      .catch((err) => {
+        console.error("Google Maps failed to load", err);
+        setReady(false);
+      });
   }, [libraries]);
 
   return ready;

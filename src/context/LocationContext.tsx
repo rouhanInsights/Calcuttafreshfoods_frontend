@@ -93,7 +93,10 @@ function loadCache(): Cached | null {
 
 function saveCache(data: Cached) {
   try {
-    localStorage.setItem(CACHE_KEY, JSON.stringify({ ...data, ts: Date.now() }));
+    localStorage.setItem(
+      CACHE_KEY,
+      JSON.stringify({ ...data, ts: Date.now() })
+    );
   } catch {}
 }
 
@@ -104,9 +107,9 @@ export const LocationProvider: React.FC<{ children: ReactNode }> = ({
   const [locationId, setLocationId] = useState<number | null>(null);
   const [areaName, setAreaName] = useState<string | null>(null);
   const [isServiceable, setIsServiceable] = useState<boolean | null>(null);
-  const [coords, setCoords] = useState<{ lat: number; lng: number } | undefined>(
-    undefined
-  );
+  const [coords, setCoords] = useState<
+    { lat: number; lng: number } | undefined
+  >(undefined);
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -129,31 +132,43 @@ export const LocationProvider: React.FC<{ children: ReactNode }> = ({
   ): Promise<{ pin: string | null; area: string | null }> => {
     if (!GOOGLE_KEY) return { pin: null, area: null };
 
-    const postalUrl = `https://maps.googleapis.com/maps/api/geocode/json?latlng=${lat},${lng}&result_type=postal_code&region=in&language=en&key=${GOOGLE_KEY}`;
+    const urls = [
+      `https://maps.googleapis.com/maps/api/geocode/json?latlng=${lat},${lng}&result_type=postal_code&region=in&language=en&key=${GOOGLE_KEY}`,
+      `https://maps.googleapis.com/maps/api/geocode/json?latlng=${lat},${lng}&region=in&language=en&key=${GOOGLE_KEY}`,
+    ];
 
-    try {
-      let res = await fetch(postalUrl);
-      let data = (await res.json()) as GeocodeResponse;
+    for (const url of urls) {
+      try {
+        const res = await fetch(url);
+        const data: GeocodeResponse = await res.json();
 
-      if (data.status !== "OK" || !data.results?.length) {
-        const fallbackUrl = `https://maps.googleapis.com/maps/api/geocode/json?latlng=${lat},${lng}&region=in&language=en&key=${GOOGLE_KEY}`;
-        res = await fetch(fallbackUrl);
-        data = (await res.json()) as GeocodeResponse;
-        if (data.status !== "OK") return { pin: null, area: null };
+        if (data.status === "OK" && data.results?.length) {
+          for (const r of data.results) {
+            const comps = r.address_components || [];
+            const pin =
+              comps.find((c) => (c.types || []).includes("postal_code"))
+                ?.long_name || null;
+            const area =
+              comps.find((c) =>
+                c.types?.some((t) =>
+                  [
+                    "locality",
+                    "sublocality",
+                    "neighborhood",
+                    "administrative_area_level_2",
+                  ].includes(t)
+                )
+              )?.long_name || null;
+
+            if (pin) return { pin, area };
+          }
+        }
+      } catch (err) {
+        console.warn("Reverse geocode failed for:", url, err);
       }
-
-      for (const r of data.results || []) {
-        const comps = r.address_components || [];
-        const pin =
-          comps.find((c) => (c.types || []).includes("postal_code"))
-            ?.long_name || null;
-        if (pin) return { pin, area: null };
-      }
-
-      return { pin: null, area: null };
-    } catch {
-      return { pin: null, area: null };
     }
+
+    return { pin: null, area: null };
   };
 
   const setManualPincode = (pin: string) => {
@@ -180,7 +195,9 @@ export const LocationProvider: React.FC<{ children: ReactNode }> = ({
 
     try {
       setLoading(true);
-      const data = await safeJsonFetch(`${API_BASE}/api/location/validate/${pin}`);
+      const data = await safeJsonFetch(
+        `${API_BASE}/api/location/validate/${pin}`
+      );
       setLocationId(data?.location_id ?? null);
       if (data?.area_name) setAreaName(data.area_name);
       setIsServiceable(Boolean(data?.is_serviceable));
@@ -209,7 +226,11 @@ export const LocationProvider: React.FC<{ children: ReactNode }> = ({
     const isLocalhost =
       typeof window !== "undefined" &&
       (location.hostname === "localhost" || location.hostname === "127.0.0.1");
-    if (typeof window !== "undefined" && !window.isSecureContext && !isLocalhost) {
+    if (
+      typeof window !== "undefined" &&
+      !window.isSecureContext &&
+      !isLocalhost
+    ) {
       setError("Please use HTTPS to allow location access.");
       return;
     }
@@ -221,20 +242,19 @@ export const LocationProvider: React.FC<{ children: ReactNode }> = ({
     setLoading(true);
     try {
       const pos = await new Promise<GeolocationPosition>((resolve, reject) =>
-        navigator.geolocation.getCurrentPosition(
-          resolve,
-          reject,
-          {
-            enableHighAccuracy: false,
-            timeout: 12000,
-            maximumAge: 60_000,
-          }
-        )
+        navigator.geolocation.getCurrentPosition(resolve, reject, {
+          enableHighAccuracy: true,
+          timeout: 20000,
+          maximumAge: 0,
+        })
       );
       const { latitude: lat, longitude: lng } = pos.coords;
       setCoords({ lat, lng });
 
       const { pin, area } = await reverseGeocode(lat, lng);
+      console.log("📍 User coordinates:", lat, lng);
+      console.log("📦 Reverse geocoded PIN:", pin, "| Area:", area);
+
       if (!pin) {
         setError("Couldn't detect your pincode. You can enter it manually.");
         return;
@@ -264,7 +284,11 @@ export const LocationProvider: React.FC<{ children: ReactNode }> = ({
     const isLocalhost =
       typeof window !== "undefined" &&
       (location.hostname === "localhost" || location.hostname === "127.0.0.1");
-    if (typeof window !== "undefined" && !window.isSecureContext && !isLocalhost) {
+    if (
+      typeof window !== "undefined" &&
+      !window.isSecureContext &&
+      !isLocalhost
+    ) {
       setError("Please use HTTPS to allow location access.");
       return;
     }
@@ -276,15 +300,11 @@ export const LocationProvider: React.FC<{ children: ReactNode }> = ({
     setLoading(true);
     try {
       const pos = await new Promise<GeolocationPosition>((resolve, reject) =>
-        navigator.geolocation.getCurrentPosition(
-          resolve,
-          reject,
-          {
-            enableHighAccuracy: true,
-            timeout: 20000,
-            maximumAge: 0,
-          }
-        )
+        navigator.geolocation.getCurrentPosition(resolve, reject, {
+          enableHighAccuracy: true,
+          timeout: 20000,
+          maximumAge: 0,
+        })
       );
       const { latitude: lat, longitude: lng } = pos.coords;
       setCoords({ lat, lng });

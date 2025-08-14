@@ -21,7 +21,11 @@ type Address = {
   landmark: string;
 };
 
-export const AddressManager = () => {
+type Props = {
+  onDefaultSet?: () => void; // ✅ receive from ProfilePageWrapper
+};
+
+export const AddressManager = ({ onDefaultSet }: Props) => {
   const [addresses, setAddresses] = useState<Address[]>([]);
   const [showForm, setShowForm] = useState(false);
   const [editOpen, setEditOpen] = useState(false);
@@ -83,20 +87,18 @@ export const AddressManager = () => {
   const setAsDefault = async (id: number) => {
     try {
       const token = localStorage.getItem("token");
-  
-      // 1. Fetch full address data first
+
       const fetchRes = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/users/addresses`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
       });
-  
+
       const allData = await fetchRes.json();
       const current = allData.find((a: Address) => a.address_id === id);
-  
+
       if (!current) return toast.error("Address not found");
-  
-      // 2. Submit full data with only is_default = true
+
       const res = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/users/addresses/${id}`, {
         method: "PUT",
         headers: {
@@ -108,24 +110,25 @@ export const AddressManager = () => {
           is_default: true,
         }),
       });
-  
+
       const data = await res.json();
-  
+
       if (res.ok) {
         toast.success("Default address updated");
         fetchAddresses();
+
+        // ✅ Notify parent to refresh the map
+        if (onDefaultSet) onDefaultSet();
       } else {
         toast.error("Failed: " + data.error);
       }
     } catch (err) {
-       toast.error("Error updating address: " + (err as Error).message);
+      toast.error("Error updating address: " + (err as Error).message);
     }
   };
-  
 
   return (
     <div className="bg-white rounded-2xl p-6 space-y-6 border-gray-100">
-      {/* Header */}
       <div className="flex justify-between items-center">
         <h2 className="text-xl font-semibold text-gray-800">Your Addresses</h2>
         <Button
@@ -138,20 +141,19 @@ export const AddressManager = () => {
         </Button>
       </div>
 
-      {/* Toggleable Add Form */}
       {showForm && (
-        <div className=" rounded-xl bg-gray-50 p-5">
+        <div className="rounded-xl bg-gray-50 p-5">
           <AddAddressForm
             mode="add"
             onSuccess={() => {
               fetchAddresses();
               setShowForm(false);
+              if (onDefaultSet) onDefaultSet(); // optional refresh
             }}
           />
         </div>
       )}
 
-      {/* Address Cards */}
       {addresses.length === 0 ? (
         <p className="text-gray-500 text-sm">No saved addresses yet.</p>
       ) : (
@@ -210,10 +212,9 @@ export const AddressManager = () => {
         </div>
       )}
 
-      {/* Edit Modal */}
       <Dialog open={editOpen} onOpenChange={setEditOpen}>
         <DialogContent className="max-w-2xl bg-white p-6 rounded-xl shadow-xl">
-          <DialogTitle>Edit Address</DialogTitle> {/* ✅ Add this */}
+          <DialogTitle>Edit Address</DialogTitle>
           {editData && (
             <AddAddressForm
               mode="edit"
@@ -221,6 +222,7 @@ export const AddressManager = () => {
               onSuccess={() => {
                 fetchAddresses();
                 setEditOpen(false);
+                if (onDefaultSet) onDefaultSet(); // optional refresh
               }}
               onCancel={() => setEditOpen(false)}
             />

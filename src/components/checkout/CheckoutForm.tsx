@@ -3,6 +3,7 @@
 import React, { useEffect, useState } from "react";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
+import { parseISO, format  } from "date-fns";
 
 type Slot = {
   slot_id: number;
@@ -19,12 +20,14 @@ type Props = {
 function getNextThreeValidDates(): Date[] {
   const validDates: Date[] = [];
   const today = new Date();
+  const dateCursor = new Date(today);
 
   while (validDates.length < 3) {
-    today.setDate(today.getDate() + 1);
-    const next = new Date(today); // clone
-    if (next.getDay() === 1) continue; // skip Monday
-    validDates.push(new Date(next));
+    dateCursor.setDate(dateCursor.getDate() + 1);
+    const next = new Date(dateCursor);
+    if (next.getDay() !== 1) {
+      validDates.push(next);
+    }
   }
 
   return validDates;
@@ -52,40 +55,49 @@ export default function CheckoutForm({
   }, []);
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-6">
+      {/* Date Picker */}
       <div>
         <label className="block text-sm font-medium text-gray-700 mb-1">
           Select Delivery Date
         </label>
-        <DatePicker
-          selected={date ? new Date(date) : null}
-          onChange={(val: Date | null) => {
-            if (val) {
-              onDateChange(val.toISOString().split("T")[0]);
+        <div className="w-full">
+          <DatePicker
+            selected={date ? parseISO(date) : null}
+            onChange={(val: Date | null) => {
+              if (val) {
+                const localDate = new Date(
+                  val.getFullYear(),
+                  val.getMonth(),
+                  val.getDate()
+                );
+                onDateChange(format(localDate, "yyyy-MM-dd"));
+              }
+            }}
+            includeDates={allowedDates}
+            placeholderText="Choose a valid date 🗓️"
+            className="w-full border font-bold text-black rounded px-3 py-2 text-sm focus:ring-2 focus:ring-green-500 focus:outline-none cursor-pointer"
+            dateFormat="MMMM do, yyyy" // ✅ e.g., August 14th, 2025
+            dayClassName={(d) =>
+              d.getDay() === 1 ? "text-red-500 bg-red-50 pointer-events-none" : ""
             }
-          }}
-          includeDates={allowedDates}
-          placeholderText="Choose a valid date 🗓️"
-          className="w-full border font-bold text-black rounded px-3 py-2 text-sm"
-          dayClassName={(date) => {
-            return date.getDay() === 1 ? "monday-disabled has-tooltip" : "";
-          }}
-          renderDayContents={(day, date) => {
-            if (date.getDay() === 1) {
-              return (
-                <div className="tooltip-wrapper">
-                  {day}
-                </div>
-              );
+            renderDayContents={(day, d) =>
+              d.getDay() === 1 ? (
+                <span title="Closed on Mondays">{day}</span>
+              ) : (
+                <span>{day}</span>
+              )
             }
-            return day;
-          }}
-        />
+            calendarClassName="border rounded-lg shadow-lg"
+            wrapperClassName="w-full"
+          />
+        </div>
         <p className="text-sm text-red-500 mt-1">
-          * Only next 3 delivery days available (Monday we are out of service)
+          * Only next 3 delivery days are available (Mondays are closed)
         </p>
       </div>
 
+      {/* Time Slots */}
       <div>
         <label className="block text-sm font-medium text-gray-700 mb-2">
           Select Delivery Time Slot
@@ -96,7 +108,7 @@ export default function CheckoutForm({
               key={s.slot_id}
               type="button"
               onClick={() => onSlotChange(s.slot_id)}
-              className={`border px-4 py-2 rounded text-sm text-center ${
+              className={`border px-4 py-2 rounded text-sm text-center transition ${
                 slot === s.slot_id
                   ? "bg-green-600 text-white border-green-600"
                   : "bg-white hover:bg-gray-50 border-gray-300"

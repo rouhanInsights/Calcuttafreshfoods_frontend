@@ -3,9 +3,10 @@
 import React from "react";
 import ProfileForm from "./ProfileForm";
 import { AddressManager } from "./AddressManager";
-import ProfileMap from "./ProfileMap";
+import LocationStatusCard from "@/components/Profile/LocationStatusCard";
 
 export default function ProfilePageWrapper() {
+
   return (
     <section className="max-w-5xl mx-auto px-4 py-10 space-y-10">
       <h1 className="text-3xl font-bold text-gray-800">My Profile</h1>
@@ -19,7 +20,7 @@ export default function ProfilePageWrapper() {
       </div>
 
       {/* ✅ Map between address section and footer */}
-      <ProfileMap />
+      <LocationStatusCard />
     </section>
   );
 }

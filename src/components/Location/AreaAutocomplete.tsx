@@ -40,7 +40,7 @@ export default function AreaAutocomplete({
   const { validatePincode, setAreaName } = useLocation();
 
   // ✅ single global loader (no duplicate scripts)
-  const ready = useGoogleMaps(["places"]);
+  const ready = useGoogleMaps(["places", "maps"])
 
   React.useEffect(() => {
     if (!ready || !inputRef.current || !window.google?.maps?.places) return;

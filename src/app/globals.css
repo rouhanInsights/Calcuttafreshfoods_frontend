@@ -87,3 +87,13 @@
   border-radius: 6px;
   position: relative;
 }
+
+.react-datepicker {
+  @apply w-full rounded-lg shadow-lg border border-gray-200;
+}
+.react-datepicker__day--disabled {
+  @apply text-gray-400 line-through cursor-not-allowed;
+}
+.react-datepicker__day--outside-month {
+  @apply text-gray-300;
+}
