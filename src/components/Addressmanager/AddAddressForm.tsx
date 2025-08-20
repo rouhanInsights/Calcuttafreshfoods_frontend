@@ -16,7 +16,11 @@ type AddressForm = {
   floor_no: string;
   landmark: string;
 };
-
+type AddressComponent = {
+  long_name: string;
+  short_name: string;
+  types: string[];
+};
 type Props = {
   onSuccess: () => void;
   onCancel?: () => void;
@@ -44,6 +48,7 @@ export default function AddAddressForm({
   });
 
   const [loading, setLoading] = useState(false);
+  const [fetchingLocation, setFetchingLocation] = useState(false);
 
   useEffect(() => {
     if (mode === "edit" && initialData) {
@@ -54,17 +59,60 @@ export default function AddAddressForm({
     }
   }, [initialData, mode]);
 
-  const handleChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
-  ) => {
-    const target = e.target as HTMLInputElement;
-    const { name, value, type } = target;
-    const checked = target.checked;
-
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value, type, checked } = e.target;
     setForm((prev) => ({
       ...prev,
       [name]: type === "checkbox" ? checked : value,
     }));
+  };
+
+  const reverseGeocode = async (lat: number, lng: number) => {
+    const key = process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY;
+    const url = `https://maps.googleapis.com/maps/api/geocode/json?latlng=${lat},${lng}&key=${key}`;
+
+    const res = await fetch(url);
+    const data = await res.json();
+
+    if (!data.results || !data.results.length) return;
+
+    const result = data.results[0];
+    const comps = result.address_components;
+
+    const get = (type: string) =>
+      (comps as AddressComponent[]).find((c) => c.types.includes(type))
+        ?.long_name || "";
+
+    const updatedFields = {
+      address_line1: result.formatted_address.split(",")[0] || "",
+      city: get("locality") || get("administrative_area_level_2") || "",
+      state: get("administrative_area_level_1") || "",
+      pincode: get("postal_code") || "",
+    };
+
+    setForm((prev) => ({ ...prev, ...updatedFields }));
+  };
+
+  const handleUseLocation = () => {
+    if (!navigator.geolocation) {
+      alert("Geolocation is not supported by your browser.");
+      return;
+    }
+
+    setFetchingLocation(true);
+    navigator.geolocation.getCurrentPosition(
+      async (position) => {
+        const { latitude, longitude } = position.coords;
+        await reverseGeocode(latitude, longitude);
+        setFetchingLocation(false);
+      },
+      (error) => {
+        alert("Failed to fetch location.");
+        console.error("Geolocation error:", error);
+        setFetchingLocation(false);
+      },
+      { timeout: 15000 }
+    );
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -120,9 +168,18 @@ export default function AddAddressForm({
       onSubmit={handleSubmit}
       className="bg-white rounded-xl shadow-md p-6 space-y-6 ring-1 ring-gray-100 border-l-[4px] border-l-[#8BAD2B]"
     >
-      <h3 className="text-lg font-semibold text-gray-800">
-        {mode === "edit" ? "Edit Address" : "Add New Address"}
-      </h3>
+      <div className="flex justify-between items-center">
+        <h3 className="text-lg font-semibold text-gray-800">
+          {mode === "edit" ? "Edit Address" : "Add New Address"}
+        </h3>
+        <Button
+          type="button"
+          onClick={handleUseLocation}
+          className="text-sm px-3 py-1 bg-blue-50 text-blue-700 border border-blue-300 hover:bg-blue-100"
+        >
+          📍 {fetchingLocation ? "Fetching..." : "Use My Location"}
+        </Button>
+      </div>
 
       <div className="grid sm:grid-cols-2 gap-4">
         <Input
@@ -131,7 +188,6 @@ export default function AddAddressForm({
           onChange={handleChange}
           placeholder="Full Name"
           required
-          className="px-4 py-2 border rounded-md bg-gray-50 focus:ring-2 focus:ring-[#8BAD2B] focus:outline-none"
         />
         <Input
           name="phone"
@@ -139,7 +195,6 @@ export default function AddAddressForm({
           onChange={handleChange}
           placeholder="Phone"
           required
-          className="px-4 py-2 border rounded-md bg-gray-50 focus:ring-2 focus:ring-[#8BAD2B] focus:outline-none"
         />
         <Input
           name="address_line1"
@@ -147,14 +202,12 @@ export default function AddAddressForm({
           onChange={handleChange}
           placeholder="Address Line 1"
           required
-          className="px-4 py-2 border rounded-md bg-gray-50 focus:ring-2 focus:ring-[#8BAD2B] focus:outline-none"
         />
         <Input
           name="address_line2"
           value={form.address_line2}
           onChange={handleChange}
           placeholder="Address Line 2"
-          className="px-4 py-2 border rounded-md bg-gray-50 focus:ring-2 focus:ring-[#8BAD2B] focus:outline-none"
         />
         <Input
           name="city"
@@ -162,7 +215,6 @@ export default function AddAddressForm({
           onChange={handleChange}
           placeholder="City"
           required
-          className="px-4 py-2 border rounded-md bg-gray-50 focus:ring-2 focus:ring-[#8BAD2B] focus:outline-none"
         />
         <Input
           name="state"
@@ -170,7 +222,6 @@ export default function AddAddressForm({
           onChange={handleChange}
           placeholder="State"
           required
-          className="px-4 py-2 border rounded-md bg-gray-50 focus:ring-2 focus:ring-[#8BAD2B] focus:outline-none"
         />
         <Input
           name="pincode"
@@ -178,21 +229,19 @@ export default function AddAddressForm({
           onChange={handleChange}
           placeholder="Pincode"
           required
-          className="px-4 py-2 border rounded-md bg-gray-50 focus:ring-2 focus:ring-[#8BAD2B] focus:outline-none"
         />
         <Input
           name="floor_no"
           value={form.floor_no}
           onChange={handleChange}
           placeholder="Floor No. (Optional)"
-          className="px-4 py-2 border rounded-md bg-gray-50 focus:ring-2 focus:ring-[#8BAD2B] focus:outline-none"
         />
         <Input
           name="landmark"
           value={form.landmark}
           onChange={handleChange}
           placeholder="Landmark (Optional)"
-          className="px-4 py-2 border rounded-md bg-gray-50 focus:ring-2 focus:ring-[#8BAD2B] focus:outline-none sm:col-span-2"
+          className="sm:col-span-2"
         />
       </div>
 
