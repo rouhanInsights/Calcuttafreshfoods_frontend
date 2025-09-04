@@ -230,26 +230,57 @@ export default function ProductDetailPage() {
 
       <section className="p-6 m-5 max-w-6xl mx-auto bg-white rounded-xl shadow-md mt-8">
         <div className="grid md:grid-cols-3 gap-6">
-          <div className="col-span-1 border-r border-gray-200 pr-3">
+          {/* Desktop sidebar */}
+          <div className="hidden md:block col-span-1 border-r border-gray-200 pr-3">
             <div className="px-3 py-2 text-xs text-muted-foreground font-semibold">
               Available Product Categories
             </div>
-            {categories.map((cat) => (
-              <Link
-                key={cat.category_id}
-                href={`/category/${cat.category_id}`}
-                className="flex items-center gap-3 px-2 py-2 rounded-md hover:bg-green-300 transition cursor-pointer"
-              >
-                <Image
-                  src={categoryImages[cat.category_id]}
-                  alt={cat.category_name}
-                  className="w-10 h-10 rounded-md object-cover"
-                  height={40}
-                  width={40}
-                />
-                <span className="text-lg font-medium">{cat.category_name}</span>
-              </Link>
-            ))}
+            <div className="flex flex-col gap-3">
+              {categories.map((cat) => (
+                <Link
+                  key={cat.category_id}
+                  href={`/category/${cat.category_id}`}
+                  className="flex items-center gap-3 px-2 py-2 rounded-md hover:bg-green-300 transition cursor-pointer"
+                >
+                  <Image
+                    src={categoryImages[cat.category_id]}
+                    alt={cat.category_name}
+                    className="w-10 h-10 rounded-md object-cover"
+                    height={40}
+                    width={40}
+                  />
+                  <span className="text-lg font-medium">
+                    {cat.category_name}
+                  </span>
+                </Link>
+              ))}
+            </div>
+          </div>
+          {/* Mobile horizontal scroll */}
+          <div className="md:hidden w-full bg-white px-4 py-4 overflow-x-auto">
+          <div className="md:hidden px-4 text-sm font-semibold text-gray-700 mt-6 mb-2">
+            Available Product Categories
+          </div>
+            <div className="flex gap-4 w-max pb-2">
+              {categories.map((cat) => (
+                <Link
+                  key={cat.category_id}
+                  href={`/category/${cat.category_id}`}
+                  className="flex flex-col items-center min-w-[80px] px-2"
+                >
+                  <Image
+                    src={categoryImages[cat.category_id]}
+                    alt={cat.category_name}
+                    className="w-14 h-14 rounded-full object-cover border border-gray-200"
+                    width={56}
+                    height={56}
+                  />
+                  <span className="text-xs text-center mt-1 font-medium text-gray-700">
+                    {cat.category_name}
+                  </span>
+                </Link>
+              ))}
+            </div>
           </div>
 
           <div className="col-span-2 pr-3">
@@ -291,7 +322,7 @@ export default function ProductDetailPage() {
                   <button
                     disabled={page === 1}
                     onClick={() => setPage((prev) => Math.max(prev - 1, 1))}
-                    className={`px-3 py-2 rounded-full border shadow-sm text-sm font-medium transition ${
+                    className={`px-2.5 py-1.5 rounded-full border shadow-sm text-xs sm:text-sm font-medium transition ${
                       page === 1
                         ? "bg-gray-100 text-gray-400 cursor-not-allowed"
                         : "bg-white text-gray-700 hover:bg-green-100"
@@ -326,7 +357,7 @@ export default function ProductDetailPage() {
                       <button
                         key={current}
                         onClick={() => setPage(current)}
-                        className={`w-10 h-10 rounded-full text-sm font-semibold border transition ${
+                        className={`w-8 h-8 sm:w-10 sm:h-10 rounded-full text-xs sm:text-sm font-semibold border transition ${
                           current === page
                             ? "bg-green-600 text-white border-green-600"
                             : "bg-white text-gray-700 hover:bg-green-100 border-gray-300"

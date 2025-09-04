@@ -7,51 +7,55 @@ const links = [
     icon: Clock,
     title: "Today's Deals",
     description: "Limited-time offers",
-    link: "#"
+    link: "#",
   },
   {
     icon: Truck,
     title: "Express Delivery",
     description: "Fast and reliable",
-    link: "#"
+    link: "#",
   },
   {
     icon: ShieldCheck,
     title: "Premium Quality",
     description: "Guaranteed freshness",
-    link: "#"
+    link: "#",
   },
   {
     icon: Phone,
     title: "Customer Support",
     description: "24/7 assistance",
-    link: "#"
-  }
+    link: "#",
+  },
 ];
 
 export const QuickLinks = () => {
   return (
-    <section  style={{ backgroundColor: "#81991f", color: "#ffffff" }} className="py-8 text-white">
-      <div className="container mx-auto px-4 md:px-8">
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-0">
-          {links.map((link, index) => (
-            <a 
-              key={index}
-              href={link.link}
-              aria-label={link.title}
-              className={`flex items-center gap-3 p-6 hover:bg-trendy-600 transition-transform transform hover:scale-105
-                ${index !== links.length - 1 ? "border-r border-white/70" : ""}
-              `}
-            >
-              <link.icon className="h-8 w-8 text-white" />
-              <div>
-                <h3 className="font-medium">{link.title}</h3>
-                <p className="text-white/80 text-sm">{link.description}</p>
-              </div>
-            </a>
-          ))}
+    <section className="bg-[#81991f] text-white py-6 sm:py-8 lg:py-10">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        {/* <div className="overflow-x-auto sm:overflow-visible scrollbar-hide"> */}
+          <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-4 gap-4">
+            {links.map((link, index) => (
+              <a
+                key={index}
+                href={link.link}
+                aria-label={link.title}
+                className="flex flex-col sm:flex-row md:flex-col items-start sm:items-center md:items-start gap-2 sm:gap-3 p-4 sm:p-5 rounded-lg bg-white/10 hover:bg-white/20 transition-all duration-200"
+              >
+                <link.icon className="w-7 h-7 sm:w-8 sm:h-8 text-white" />
+                <div className="space-y-0.5">
+                  <h3 className="text-sm sm:text-base md:text-lg font-semibold leading-snug">
+                    {link.title}
+                  </h3>
+                  <p className="text-xs sm:text-sm text-white/80">
+                    {link.description}
+                  </p>
+                </div>
+              </a>
+            ))}
+          </div>
         </div>
-      </div>
+      {/* </div> */}
     </section>
   );
 };

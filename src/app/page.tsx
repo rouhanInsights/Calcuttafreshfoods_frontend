@@ -50,11 +50,7 @@ export default function Home() {
     <>
       <HeroSection />
       <QuickLinks />
-      <ProductsSection
-        title="Top Offers"
-        products={topOffers}
-        viewAllLink="/products/top-offers"
-      />
+      
 
       <ProductsSection
         title="Best Sellers"
@@ -68,8 +64,14 @@ export default function Home() {
         viewAllLink="/products/all"
       />
 
+      <ProductsSection
+        title="Top Offers"
+        products={topOffers}
+        viewAllLink="/products/top-offers"
+      />
       <CategoryBanner />
       {/* <MobileApp /> */}
     </>
+    
   );
 }
