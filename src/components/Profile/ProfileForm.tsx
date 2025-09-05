@@ -25,14 +25,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import {
-  User,
-  Mail,
-  AtSign,
-  Phone,
-  Smartphone,
-  Calendar,
-} from "lucide-react";
+import { User, Mail, AtSign, Phone, Smartphone, Calendar } from "lucide-react";
 import { format } from "date-fns";
 
 const profileSchema = z.object({
@@ -90,16 +83,103 @@ export default function ProfileForm() {
       .catch((err) => console.error("Profile fetch failed:", err));
   }, [token, form]);
 
-  const handleAvatarChange = () => {
-    toast("The feature is currently unavailable", {
-      description: "Please wait for the next update.",
-      duration: 3000,
-      icon: "⚠️",
-      action: {
-        label: "Got it",
-        onClick: () => toast.dismiss(),
-      },
-    });
+  const handleAvatarChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file || !token) return;
+
+    const formData = new FormData();
+    formData.append("image", file);
+
+    try {
+      const res = await fetch(
+        `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/upload/profile-image`,
+        {
+          method: "POST",
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+          body: formData,
+        }
+      );
+
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || "Upload failed");
+
+      const imageUrl = data.imageUrl;
+
+      setAvatarPreview(imageUrl);
+      form.setValue("profile_image", imageUrl);
+
+      // ✅ Get the full current form values
+      const current = form.getValues();
+
+      const payload = {
+        ...current,
+        alt_email: current.alt_email?.trim() || null,
+        alt_phone: current.alt_phone?.trim() || null,
+        profile_image_url: imageUrl, // ✅ Save image URL
+      };
+
+      const updateRes = await fetch(
+        `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/users/profile`,
+        {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify(payload),
+        }
+      );
+
+      if (!updateRes.ok) {
+        toast.warning("Image uploaded but profile update failed.");
+      } else {
+        toast.success("Profile image updated successfully!");
+      }
+    } catch (err) {
+      toast.error("Image upload failed", {
+        description: (err as Error).message,
+      });
+    }
+  };
+
+  const handleRemoveAvatar = async () => {
+    if (!token) return;
+
+    try {
+      const current = form.getValues();
+
+      const payload = {
+        ...current,
+        alt_email: current.alt_email?.trim() || null,
+        alt_phone: current.alt_phone?.trim() || null,
+        profile_image_url: null, // ✅ Remove image from DB
+      };
+
+      const res = await fetch(
+        `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/users/profile`,
+        {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify(payload),
+        }
+      );
+
+      if (!res.ok) throw new Error("Failed to remove profile image");
+
+      setAvatarPreview("");
+      form.setValue("profile_image", "");
+
+      toast.success("Profile image removed successfully");
+    } catch (err) {
+      toast.error("❌ Failed to remove image", {
+        description: (err as Error).message,
+      });
+    }
   };
 
   const onSubmit = async (data: ProfileFormValues) => {
@@ -110,17 +190,21 @@ export default function ProfileForm() {
       ...data,
       alt_email: data.alt_email?.trim() || null,
       alt_phone: data.alt_phone?.trim() || null,
+      profile_image_url: data.profile_image ?? null,
     };
 
     try {
-      const res = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/users/profile`, {
-        method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify(sanitizedData),
-      });
+      const res = await fetch(
+        `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/users/profile`,
+        {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify(sanitizedData),
+        }
+      );
 
       if (!res.ok) throw new Error("Failed to update profile");
 
@@ -143,7 +227,9 @@ export default function ProfileForm() {
 
   return (
     <div className="space-y-8 rounded-xl pt-6 ">
-      <div className="text-xl font-semibold text-gray-800">Personal Information</div>
+      <div className="text-xl font-semibold text-gray-800">
+        Personal Information
+      </div>
 
       <div className="flex flex-col sm:flex-row gap-6 bg-white p-6 sm:p-8 rounded-2xl border-gray-100 transition-all">
         {/* Avatar Section */}
@@ -154,13 +240,30 @@ export default function ProfileForm() {
               {initials}
             </AvatarFallback>
           </Avatar>
+
           <Label
             htmlFor="avatar"
-            onClick={handleAvatarChange}
             className="cursor-pointer text-sm px-3 py-1 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-md transition-colors"
           >
             Change Photo
+            <input
+              type="file"
+              accept="image/*"
+              className="hidden"
+              id="avatar"
+              onChange={handleAvatarChange}
+            />
           </Label>
+
+          {avatarPreview && (
+            <Button
+              variant="ghost"
+              className="text-sm text-red-500 hover:text-red-700 px-2 py-1"
+              onClick={handleRemoveAvatar}
+            >
+              Remove Photo
+            </Button>
+          )}
         </div>
 
         {/* Form Section */}
