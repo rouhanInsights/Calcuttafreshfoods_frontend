@@ -105,3 +105,6 @@
   -ms-overflow-style: none;
   scrollbar-width: none;
 }
+[data-radix-popper-content-wrapper] {
+  touch-action: manipulation;
+}

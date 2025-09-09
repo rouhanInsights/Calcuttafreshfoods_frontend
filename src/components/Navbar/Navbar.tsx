@@ -237,21 +237,60 @@ export const Navbar = () => {
             {/* Profile/Login */}
             {!loading &&
               (token && user ? (
-                <Link
-                  href="/profile"
-                  className="flex items-center gap-2 px-2 py-1 border border-gray-300 rounded-full hover:shadow-sm"
-                  aria-label="Profile"
-                >
-                  <Avatar className="h-8 w-8">
-                    <AvatarImage
-                      src={user.profile_image_url || "/images/user.png"}
-                      alt="User"
-                    />
-                    <AvatarFallback>
-                      {user.name?.[0]?.toUpperCase() || "U"}
-                    </AvatarFallback>
-                  </Avatar>
-                </Link>
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <div
+                      className="flex items-center gap-2 px-2 py-1 border border-gray-300 rounded-full hover:shadow-sm cursor-pointer"
+                      aria-label="Profile Menu"
+                    >
+                      <Avatar className="h-8 w-8">
+                        <AvatarImage
+                          src={user.profile_image_url || "/images/user.png"}
+                          alt="User"
+                        />
+                        <AvatarFallback>
+                          {user.name?.[0]?.toUpperCase() || "U"}
+                        </AvatarFallback>
+                      </Avatar>
+                      <span className="text-sm font-medium text-gray-700 hidden sm:inline">
+                        Profile
+                      </span>
+                    </div>
+                  </DropdownMenuTrigger>
+
+                  <DropdownMenuContent
+                    className="w-[200px] py-2 bg-white border border-gray-200 shadow-lg rounded-md z-[999]"
+                    align="end"
+                  >
+                    <div className="px-3 py-1.5 text-sm text-muted-foreground font-medium">
+                      My Account
+                    </div>
+                    <DropdownMenuSeparator className="my-2 h-px bg-gray-200" />
+                    <DropdownMenuItem asChild>
+                      <Link
+                        href="/profile"
+                        className="flex items-center gap-2 px-3 py-2 rounded-md transition hover:bg-green-100 cursor-pointer"
+                      >
+                        <User className="w-4 h-4" /> Profile
+                      </Link>
+                    </DropdownMenuItem>
+                    <DropdownMenuItem asChild>
+                      <Link
+                        href="/myorder"
+                        className="flex items-center gap-2 px-3 py-2 rounded-md transition hover:bg-green-100 cursor-pointer"
+                      >
+                        <ClipboardList className="w-4 h-4" /> My Orders
+                      </Link>
+                    </DropdownMenuItem>
+                    <DropdownMenuSeparator className="my-2 h-px bg-gray-200" />
+                    <DropdownMenuItem
+                      onClick={logout}
+                      className="flex items-center gap-2 px-3 py-2 rounded-md transition hover:bg-red-50 text-red-600 cursor-pointer"
+                    >
+                      <LogOut className="w-4 h-4" /> Logout
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
               ) : (
                 <Link href="/login" aria-label="Login">
                   <Button
@@ -448,23 +487,29 @@ export const Navbar = () => {
             (token && user ? (
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
-                  <div className="flex items-center gap-2 cursor-pointer px-2 py-1 border border-gray-300 rounded-full hover:shadow-sm">
+                  <div className="flex items-center justify-between gap-2 px-2 py-1 border border-gray-300 rounded-full hover:shadow-sm cursor-pointer min-w-[48px] w-full sm:w-auto max-w-[200px]">
                     <Avatar className="h-8 w-8">
                       <AvatarImage
                         src={user.profile_image_url || "/images/user.png"}
                         alt="User"
                       />
                       <AvatarFallback>
-                        {user.name?.[0]?.toUpperCase() || "UI"}
+                        {user.name?.[0]?.toUpperCase() || "U"}
                       </AvatarFallback>
                     </Avatar>
-                    <span className="text-sm font-medium text-gray-700 hidden md:inline">
+
+                    {/* Profile text for larger screens only */}
+                    <span className="hidden sm:inline text-sm font-medium text-gray-700">
                       Profile
                     </span>
+
+                    {/* Chevron for mobile & all sizes */}
+                    <ChevronDown className="w-4 h-4 text-gray-500" />
                   </div>
                 </DropdownMenuTrigger>
+
                 <DropdownMenuContent
-                  className="w-46 py-2 bg-white border border-gray-200 shadow-lg rounded-md"
+                  className="w-[230px] py-2 bg-white border border-gray-200 shadow-lg rounded-md z-[999]"
                   align="end"
                 >
                   <div className="px-3 py-1.5 text-sm text-muted-foreground font-medium">
