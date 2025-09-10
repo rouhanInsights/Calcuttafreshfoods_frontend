@@ -1,22 +1,46 @@
+// import type { NextConfig } from "next";
+
+// const nextConfig: NextConfig = {
+//   images: {
+//     remotePatterns: [
+//       {
+//         protocol: "https",
+//         hostname: "upload.wikimedia.org",
+//         pathname: "/**",
+//       },
+//       {
+//         protocol: "https",
+//         hostname: "calcuttafreshfoods.com",
+//         pathname: "/**",
+//       },
+//       {
+//         protocol: "https",
+//         hostname: "res.cloudinary.com", 
+//         pathname: "/**",
+//       },
+//     ],
+//   },
+// };
+
+// export default nextConfig;
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
+  /* config options here */
   images: {
+     domains: ["bucket-dh7ovx.s3.ap-south-1.amazonaws.com"],
     remotePatterns: [
-      {
-        protocol: "https",
-        hostname: "upload.wikimedia.org",
-        pathname: "/**",
-      },
+      
       {
         protocol: "https",
         hostname: "calcuttafreshfoods.com",
         pathname: "/**",
       },
-      {
+       {
         protocol: "https",
-        hostname: "res.cloudinary.com", 
-        pathname: "/**",
+        hostname: "s3.ap-south-1.amazonaws.com",
+        port: "",
+        pathname: "/bucket-dh7ovx/product-image/**",
       },
     ],
   },
