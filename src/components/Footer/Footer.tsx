@@ -41,8 +41,8 @@ export const Footer = () => {
             <h4 className="font-semibold text-lg mb-4">Categories</h4>
             <ul className="space-y-2">
               <li><Link href="/category/2" className="text-gray-400 hover:text-white">Fish & Seafood</Link ></li>
-              <li><Link href="/category/4" className="text-gray-400 hover:text-white">Mutton</Link></li>
-              <li><Link href="/category/3" className="text-gray-400 hover:text-white">Poultry</Link></li>
+              <li><Link href="/category/4" className="text-gray-400 hover:text-white">Poultry</Link></li>
+              <li><Link href="/category/3" className="text-gray-400 hover:text-white">Mutton</Link></li>
               <li><Link href="/category/5" className="text-gray-400 hover:text-white">Steak & Fillets</Link></li>
               <li><Link href="/category/1" className="text-gray-400 hover:text-white">Exclusive Fish & Meat</Link></li>
             </ul>
@@ -53,8 +53,8 @@ export const Footer = () => {
             <ul className="space-y-2">
               <li><a href="#" className="text-gray-400 hover:text-white">About Us</a></li>
               <li><a href="#" className="text-gray-400 hover:text-white">Contact Us</a></li>
-              <li><a href="#" className="text-gray-400 hover:text-white">Terms & Conditions</a></li>
-              <li><a href="#" className="text-gray-400 hover:text-white">Privacy Policy</a></li>
+              <li><a href="/TermsandCondition" className="text-gray-400 hover:text-white">Terms & Conditions</a></li>
+              <li><a href="/PrivacyPolicy" className="text-gray-400 hover:text-white">Privacy Policy</a></li>
               <li><a href="#" className="text-gray-400 hover:text-white">Return Policy</a></li>
             </ul>
           </div>
