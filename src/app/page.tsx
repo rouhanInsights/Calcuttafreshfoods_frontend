@@ -49,9 +49,6 @@ export default function Home() {
   return (
     <>
       <HeroSection />
-      <QuickLinks />
-      
-
       <ProductsSection
         title="Best Sellers"
         products={bestSellers}
@@ -71,6 +68,7 @@ export default function Home() {
       />
       <CategoryBanner />
       {/* <MobileApp /> */}
+      <QuickLinks />
     </>
     
   );

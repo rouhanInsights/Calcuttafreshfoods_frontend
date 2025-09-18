@@ -3,7 +3,7 @@
 import React, { useEffect, useState } from "react";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
-import { parseISO, format  } from "date-fns";
+import { parseISO, format } from "date-fns";
 
 type Slot = {
   slot_id: number;
@@ -20,13 +20,18 @@ type Props = {
 function getNextThreeValidDates(): Date[] {
   const validDates: Date[] = [];
   const today = new Date();
-  const dateCursor = new Date(today);
 
-  while (validDates.length < 3) {
+  // ✅ Include today if it's not Monday
+  if (today.getDay() !== 1) {
+    validDates.push(new Date(today));
+  }
+
+  const dateCursor = new Date(today);
+  while (validDates.length < 4) {
     dateCursor.setDate(dateCursor.getDate() + 1);
     const next = new Date(dateCursor);
     if (next.getDay() !== 1) {
-      validDates.push(next);
+      validDates.push(new Date(next));
     }
   }
 
@@ -54,6 +59,14 @@ export default function CheckoutForm({
     setAllowedDates(getNextThreeValidDates());
   }, []);
 
+  // 🧠 Smart logic for slot disabling
+  const now = new Date();
+  const selectedDateObj = date ? parseISO(date) : null;
+  const isSameDay =
+    selectedDateObj &&
+    now.toDateString() === selectedDateObj.toDateString();
+  const isAfter6AM = now.getHours() >= 6;
+
   return (
     <div className="space-y-6">
       {/* Date Picker */}
@@ -77,9 +90,11 @@ export default function CheckoutForm({
             includeDates={allowedDates}
             placeholderText="Choose a valid date 🗓️"
             className="w-full border font-bold text-black rounded px-3 py-2 text-sm focus:ring-2 focus:ring-green-500 focus:outline-none cursor-pointer"
-            dateFormat="MMMM do, yyyy" // ✅ e.g., August 14th, 2025
+            dateFormat="MMMM do, yyyy"
             dayClassName={(d) =>
-              d.getDay() === 1 ? "text-red-500 bg-red-50 pointer-events-none" : ""
+              d.getDay() === 1
+                ? "text-red-500 bg-red-50 pointer-events-none"
+                : ""
             }
             renderDayContents={(day, d) =>
               d.getDay() === 1 ? (
@@ -103,20 +118,26 @@ export default function CheckoutForm({
           Select Delivery Time Slot
         </label>
         <div className="grid grid-cols-2 gap-3">
-          {slots.map((s) => (
-            <button
-              key={s.slot_id}
-              type="button"
-              onClick={() => onSlotChange(s.slot_id)}
-              className={`border px-4 py-2 rounded text-sm text-center transition ${
-                slot === s.slot_id
-                  ? "bg-green-600 text-white border-green-600"
-                  : "bg-white hover:bg-gray-50 border-gray-300"
-              }`}
-            >
-              {s.slot_details}
-            </button>
-          ))}
+          {slots.map((s) => {
+            const isSlot1 = s.slot_id === 1; // 🕗 Slot 1 = 8–10 AM
+            const disableSlot = Boolean(isSameDay && isAfter6AM && isSlot1);
+
+            return (
+              <button
+                key={s.slot_id}
+                type="button"
+                onClick={() => !disableSlot && onSlotChange(s.slot_id)}
+                disabled={disableSlot}
+                className={`border px-4 py-2 rounded text-sm text-center transition ${
+                  slot === s.slot_id
+                    ? "bg-green-600 text-white border-green-600"
+                    : "bg-white hover:bg-gray-50 border-gray-300"
+                } ${disableSlot ? "opacity-50 cursor-not-allowed" : ""}`}
+              >
+                {s.slot_details}
+              </button>
+            );
+          })}
         </div>
       </div>
     </div>

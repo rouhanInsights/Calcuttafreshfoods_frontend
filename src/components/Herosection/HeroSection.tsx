@@ -103,14 +103,14 @@ export default function HeroSection() {
          - min-heights keep mobile layout stable
          - padding-top helps if you have a fixed header
       */
-      className="relative w-full min-h-[460px] md:min-h-[560px] flex items-end md:items-center justify-start bg-cover bg-center transition-all duration-1000 ease-in-out overflow-hidden pt-4 md:pt-0"
+      className="relative w-full min-h-[560px] md:min-h-[560px] flex items-end md:items-center justify-start bg-cover bg-center transition-all duration-1000 ease-in-out overflow-hidden pt-4 md:pt-0"
       style={{ backgroundImage: `url(/${bgImage})` }}
     >
       {/* Dark overlay sits below content */}
-      <div className="absolute inset-0 bg-black/50 z-[1] pointer-events-none" />
+      <div className="absolute bg-black/50 z-[1] pointer-events-none" />
 
       {/* Hero Content */}
-      <div className="relative z-[2] text-left w-full px-5 sm:px-8 pb-10 md:pb-0 max-w-xl">
+      <div className="relative z-[2] text-left w-full px-5 sm:px-8 pb-0 md:pb-0 max-w-xl">
         {selectedContent && (
           <>
             {greeting && (
@@ -137,7 +137,7 @@ export default function HeroSection() {
             </Link>
 
             <p className="mt-4 text-white text-sm sm:text-base font-medium">
-              *Got a question? We&apos;re here to help — +91 123456 7890
+              *Got a question? We&apos;re here to help — (+91) 123****890
             </p>
 
             {/* Dots Indicator */}
@@ -156,12 +156,13 @@ export default function HeroSection() {
       </div>
 
       {/* Diagonal Divider */}
-      <div
+      {/* <div
         className="absolute bottom-0 left-0 right-0 h-16 bg-white z-10 transition-colors duration-300 ease-in-out"
         style={{
           clipPath: "polygon(0 100%, 100% 0, 100% 100%, 0% 100%)",
         }}
-      ></div>
+      ></div> */}
+      <div className="absolute bottom-0 left-0 right-0 h-12 bg-white z-10"></div>
     </section>
   );
 }
