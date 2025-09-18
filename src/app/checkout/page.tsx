@@ -136,21 +136,22 @@ export default function CheckoutPage() {
     }
 
     // ✅ Same-day cutoff logic
+    // ✅ Same-day slot logic
     const now = new Date();
     const selected = new Date(selectedDate);
     const isSameDay = now.toDateString() === selected.toDateString();
-    const nineAM = new Date();
-    nineAM.setHours(9, 0, 0, 0);
+    const sixAM = new Date();
+    sixAM.setHours(6, 0, 0, 0);
 
-    if (isSameDay && now > nineAM) {
+    if (isSameDay && now > sixAM && selectedSlot === 1) {
       toast.custom(() => (
         <div className="bg-orange-50 border border-orange-300 rounded-md px-4 py-2 shadow flex items-start gap-3 text-orange-900 text-sm max-w-sm w-full">
           <div className="text-xl">⚠️</div>
           <div className="flex-1">
-            <p className="font-semibold">Same-day delivery cutoff</p>
+            <p className="font-semibold">Early slot not available</p>
             <p className="text-xs leading-snug mt-0.5">
-              Orders for today must be placed before 9:00 AM. Please select a
-              future date.
+              Orders placed after 6:00 AM today can only be delivered in the
+              10–12 slot.
             </p>
           </div>
         </div>

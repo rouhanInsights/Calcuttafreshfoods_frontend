@@ -108,7 +108,7 @@ export default function CheckoutForm({
           />
         </div>
         <p className="text-sm text-red-500 mt-1">
-          * Only next 3 delivery days are available (Mondays are closed)
+          * Only next 3 delivery days from today are available (Mondays are closed)
         </p>
       </div>
 
