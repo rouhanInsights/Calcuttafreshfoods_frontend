@@ -158,7 +158,35 @@ export default function CheckoutPage() {
       ));
       return;
     }
+    // ✅ Minimum order check
+    const cartSubtotal = cart.items.reduce((sum, item) => {
+  return sum + item.price * (item.quantity ?? 1);
+}, 0);
 
+
+    if (cartSubtotal < 300) {
+      toast.custom(() => (
+        <div className="bg-orange-50 border border-orange-300 rounded-md px-4 py-2 shadow flex items-start gap-3 text-orange-900 text-sm max-w-sm w-full">
+          <div className="text-xl">⚠️</div>
+          <div className="flex-1">
+            <p className="font-semibold">Minimum order value not met</p>
+            <p className="text-xs leading-snug mt-0.5">
+              Your cart total is ₹{cartSubtotal}. Minimum order value is ₹300.
+            </p>
+            <Button
+              variant={"ghost"}
+              onClick={() => router.push("/products/all")}
+              className="mt-2 text-green-700 border border-green-600 hover:bg-green-50 font-medium text-sm"
+            >
+              ➕ Add Products
+            </Button>
+          </div>
+        </div>
+      ));
+      return;
+    }
+
+    
     // ✅ Prepare order
     const orderItems = cart.items.map((item) => ({
       product_id: item.id,
@@ -166,6 +194,7 @@ export default function CheckoutPage() {
       price: item.price,
     }));
 
+    
     const total_price = orderItems.reduce(
       (total, item) => total + item.price * item.quantity,
       0
