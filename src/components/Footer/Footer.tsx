@@ -12,9 +12,10 @@ export const Footer = () => {
           <div>
             <div className="mb-4">
             <Image
-                src="/images/logo.png"
+                src="/logo.png"
                 width={300}
                 height={200}
+                priority={false}
                 alt="Picture of the author"
                 />
             </div>

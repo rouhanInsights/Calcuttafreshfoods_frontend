@@ -209,11 +209,11 @@ export const Navbar = () => {
             aria-label="Go to homepage"
           >
             <Image
-              src="/images/logo.png"
+              src="/logo.png"
               width={130}
               height={40}
               alt="Brand Logo"
-              priority
+              priority={false}
               className="h-auto w-auto"
             />
           </Link>
