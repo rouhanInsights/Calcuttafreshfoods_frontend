@@ -80,7 +80,9 @@ export default function OtpScreen() {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify(
-            identifier.includes("@") ? { email: identifier } : { phone: identifier }
+            identifier.includes("@")
+              ? { email: identifier }
+              : { phone: identifier }
           ),
         }
       );
@@ -120,7 +122,7 @@ export default function OtpScreen() {
         <Button
           onClick={handleVerifyOtp}
           disabled={verifying || otp.length !== 6}
-          className="w-full bg-[#8BAD2B] hover:bg-[#779624]"
+          className="w-full bg-[#046B3B] hover:bg-[#18A558] text-white py-2 rounded-md text-sm font-medium transition-colors disabled:opacity-50"
         >
           {verifying ? "Verifying..." : "Verify OTP"}
         </Button>

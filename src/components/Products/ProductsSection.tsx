@@ -40,7 +40,7 @@ export const ProductsSection = ({
           <h2 className="text-2xl font-bold text-gray-800">{title}</h2>
           <Button
             variant="link"
-            className="text-green-600 hover:text-green-700"
+            className="#18A558 text-[#006b3d] hover:text-[#18A558] font-medium"
             asChild
           >
             <a href={viewAllLink}>View all</a>

@@ -86,11 +86,11 @@ export const ProductCard = ({
             {weight || "Standard Pack"}
           </p>
           <div className="flex items-center gap-2 mt-auto">
-            <span className="text-lg font-bold text-green-700">
+            <span className="text-lg font-bold text-[#006b3d]">
               ₹{displayPrice}
             </span>
             {originalPrice && (
-              <span className="text-sm text-gray-400 line-through">
+              <span className="text-sm text-[#18A558] line-through">
                 ₹{originalPrice}
               </span>
             )}

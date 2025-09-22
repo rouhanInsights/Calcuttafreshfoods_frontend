@@ -76,7 +76,7 @@ export default function LoginScreen() {
         <Button
           onClick={handleSendOtp}
           disabled={sending || !identifier}
-          className="w-full bg-[#8BAD2B] hover:bg-[#779624]"
+          className="w-full bg-[#046B3B] hover:bg-[#18A558] text-white py-2 rounded-md text-sm font-medium transition-colors disabled:opacity-50"
         >
           {sending ? "Sending..." : "Send OTP"}
         </Button>

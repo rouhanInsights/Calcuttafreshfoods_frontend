@@ -6,7 +6,7 @@ export const ProductOfferBanner = () => {
   return (
     <div
       className="text-white py-4 px-4 md:px-8"
-      style={{ background: "linear-gradient(to right, #81991f, #6fa31e)" }}
+      style={{ background: "linear-gradient(to right, #5aa812ff, #006b3d 50%)" }}
     >
       <div className="container mx-auto flex flex-col md:flex-row items-center justify-between">
         <div className="flex items-center gap-2 mb-3 md:mb-0 text-sm md:text-base">
@@ -22,7 +22,7 @@ export const ProductOfferBanner = () => {
         <Link href="/products/all">
           <Button
             variant="outline"
-            className="bg-transparent border-white text-white hover:bg-white hover:text-[#81991f] transition-colors"
+            className="bg-transparent border-white text-white hover:bg-white hover:text-[#006b3d] transition-colors"
           >
             Shop Now <ArrowRight className="ml-2 h-4 w-4" />
           </Button>

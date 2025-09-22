@@ -295,8 +295,7 @@ export const Navbar = () => {
                 <Link href="/login" aria-label="Login">
                   <Button
                     size="sm"
-                    className="h-8 px-3 text-xs"
-                    style={{ backgroundColor: "#81991f", color: "#ffffff" }}
+                    className="h-8 px-3 text-xs bg-[#046B3B] hover:bg-[#18A558] text-white"
                   >
                     Login
                   </Button>
@@ -543,9 +542,7 @@ export const Navbar = () => {
               </DropdownMenu>
             ) : (
               <Link href="/login">
-                <Button
-                  style={{ backgroundColor: "#81991f", color: "#ffffff" }}
-                >
+                <Button className="!bg-[#046B3B] !text-white hover:!bg-[#18A558]">
                   Login
                 </Button>
               </Link>

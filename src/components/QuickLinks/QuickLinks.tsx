@@ -31,7 +31,7 @@ const links = [
 
 export const QuickLinks = () => {
   return (
-    <section className="bg-[#81991f] text-white py-6 sm:py-8 lg:py-10">
+    <section className="bg-[#006b3d] text-white py-6 sm:py-8 lg:py-10">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* <div className="overflow-x-auto sm:overflow-visible scrollbar-hide"> */}
           <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-4 gap-4">

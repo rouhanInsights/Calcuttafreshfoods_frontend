@@ -178,14 +178,14 @@ export default function CartPage() {
               </Button>
               {user ? (
                 <Button
-                  className="w-full bg-green-600 hover:bg-green-700 text-white"
+                  className="w-full bg-[#046B3B] hover:bg-[#18A558] text-white"
                   onClick={() => router.push("/checkout")}
                 >
                   Proceed to Checkout
                 </Button>
               ) : (
                 <Button
-                  className="w-full bg-green-500 hover:bg-green-600 text-white"
+                  className="w-full bg-[#046B3B] hover:bg-[#18A558] text-white"
                   onClick={() => router.push("/login")}
                 >
                   Login to Continue

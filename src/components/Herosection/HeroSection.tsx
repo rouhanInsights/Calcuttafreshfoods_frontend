@@ -129,7 +129,7 @@ export default function HeroSection() {
               <Button
                 onClick={handleScrollToOffers}
                 size="lg"
-                className="bg-[#81991f] hover:bg-[#6fa31e] text-white px-6 sm:px-8 py-5 text-base sm:text-lg transition-transform hover:scale-105 animate-float"
+                className="bg-[#006b3d] hover:bg-[#18A558] text-white px-6 sm:px-8 py-5 text-base sm:text-lg transition-transform hover:scale-105 animate-float"
               >
                 <FiShoppingCart />
                 Shop Now
@@ -137,7 +137,7 @@ export default function HeroSection() {
             </Link>
 
             <p className="mt-4 text-white text-sm sm:text-base font-medium">
-              *Got a question? We&apos;re here to help — (+91) 123****890
+              *Got a question? We&apos;re here to help — (+91) 9123929282
             </p>
 
             {/* Dots Indicator */}
