@@ -61,14 +61,14 @@ export const Footer = () => {
           
           <div>
             <h4 className="font-semibold text-lg mb-4">Contact Us</h4>
-            <p className="text-gray-400 mb-2">
+            {/* <p className="text-gray-400 mb-2">
               Kolkata, West Bengal, India, 700000
-            </p>
+            </p> */}
             <p className="text-gray-400 mb-2">
               Phone: +91 9123929282
             </p>
             <p className="text-gray-400 mb-2">
-              Email: halderbijoy182@gmail.com
+              Email: calcuttafreshfoods1@gmail.com
             </p>
           </div>
         </div>
