@@ -62,7 +62,7 @@ export const ProductCard = ({
               />
             </div>
           )}
-          {discount && discount > 8 && (
+          {discount && discount > 0 && (
             <span className="absolute top-2 left-2 bg-red-600 text-white text-xs font-bold px-2 py-1 rounded-full z-10 shadow">
               {discount}% OFF
             </span>

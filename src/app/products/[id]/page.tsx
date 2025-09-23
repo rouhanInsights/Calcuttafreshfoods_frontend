@@ -98,8 +98,8 @@ export default function ProductDetailPage() {
 
   const categoryImages: Record<number, string> = {
     1: "/images/exclusive.png",
-    2: "/images/fish2.png",
-    3: "/images/mutton2.png",
+    2: "/images/Fish2.png",
+    3: "/images/Mutton2.png",
     4: "/images/chicken.png",
     5: "/images/fillets2.jpg",
   };
