@@ -66,6 +66,7 @@ export default function CheckoutForm({
     selectedDateObj &&
     now.toDateString() === selectedDateObj.toDateString();
   const isAfter6AM = now.getHours() >= 6;
+  const isAfter9AM = now.getHours() >= 9;
 
   return (
     <div className="space-y-6">
@@ -119,8 +120,9 @@ export default function CheckoutForm({
         </label>
         <div className="grid grid-cols-2 gap-3">
           {slots.map((s) => {
-            const isSlot1 = s.slot_id === 1; // 🕗 Slot 1 = 8–10 AM
-            const disableSlot = Boolean(isSameDay && isAfter6AM && isSlot1);
+            const isSlot1 = s.slot_id === 1;
+            const isSlot2 = s.slot_id === 2;
+            const disableSlot = Boolean(isSameDay && isAfter6AM && isSlot1 || isAfter9AM && isSlot2);
 
             return (
               <button
