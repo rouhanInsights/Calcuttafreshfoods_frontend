@@ -63,8 +63,7 @@ export default function CheckoutForm({
   const now = new Date();
   const selectedDateObj = date ? parseISO(date) : null;
   const isSameDay =
-    selectedDateObj &&
-    now.toDateString() === selectedDateObj.toDateString();
+    selectedDateObj && now.toDateString() === selectedDateObj.toDateString();
   const isAfter6AM = now.getHours() >= 6;
   const isAfter9AM = now.getHours() >= 9;
 
@@ -109,7 +108,8 @@ export default function CheckoutForm({
           />
         </div>
         <p className="text-sm text-red-500 mt-1">
-          * Only next 3 delivery days from today are available (Mondays are closed)
+          * Only next 3 delivery days from today are available (Mondays are
+          closed)
         </p>
       </div>
 
@@ -122,7 +122,9 @@ export default function CheckoutForm({
           {slots.map((s) => {
             const isSlot1 = s.slot_id === 1;
             const isSlot2 = s.slot_id === 2;
-            const disableSlot = Boolean(isSameDay && isAfter6AM && isSlot1 || isAfter9AM && isSlot2);
+            const disableSlot = Boolean(
+              (isSameDay && isAfter6AM && isSlot1) || (isSameDay && isAfter9AM && isSlot2)
+            );
 
             return (
               <button
