@@ -13,9 +13,9 @@ import { LocationProvider } from "@/context/LocationContext";
 
 export const metadata = {
   title: "Calcutta Fresh Foods",
-  description: "Fresh fish and meat delivered to your doorstep",
+  description: "Fresh fish and meat delivered to your doorstep in Kolkata. we have a wide range of fresh fish and meat products to choose from. Categories include fresh fish and seafoods, Exclusive fish and seafood and meat products, Polutry, Mutton, Steak & Fillets. Order now and experience the best quality and service.",
   icons: {
-    icon: "/favicon.jpeg", // Or /favicon.ico
+    icon: "/favicon1.png", // Or /favicon.ico
   },
 };
 

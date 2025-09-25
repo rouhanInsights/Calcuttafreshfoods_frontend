@@ -9,7 +9,7 @@ const categories = [
     name: "Fish & Seafood",
     image: "/images/fish.png",
     description: "Freshwater and seawater fish varieties",
-    url: "/category/1",
+    url: "/category/2",
   },
   {
     name: "Premium Chicken",
@@ -20,7 +20,7 @@ const categories = [
   {
     name: "Tender Mutton",
     image: "/images/mutton.png",
-    description: "Goat and lamb meat prepared for various dishes",
+    description: "Premium quality mutton curated for your favorite dishes",
     url: "/category/3",
   }
 ];

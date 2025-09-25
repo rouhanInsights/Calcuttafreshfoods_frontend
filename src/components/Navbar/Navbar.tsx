@@ -449,7 +449,7 @@ export const Navbar = () => {
               className="bg-white border border-gray-200 shadow-lg mt-2 w-56 max-h-72 overflow-y-auto rounded-md"
               align="start"
             >
-              <div className="px-3 py-2 text-xs text-muted-foreground font-semibold">
+              <div className="block w-full px-3 py-2 text-sm rounded-md font-medium text-gray-700">
                 Available Product Categories
               </div>
               <DropdownMenuSeparator className="my-1 h-px bg-gray-200" />

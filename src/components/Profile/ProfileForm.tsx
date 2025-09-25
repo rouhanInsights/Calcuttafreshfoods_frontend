@@ -25,8 +25,16 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { User, Mail, AtSign, Phone, Smartphone, Calendar } from "lucide-react";
+import { User, Mail, AtSign, Phone, Smartphone } from "lucide-react";
 import { format } from "date-fns";
+import { Calendar as CalendarIcon } from "lucide-react";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
+import { Calendar } from "@/components/ui/calendar";
+import { cn } from "@/lib/utils";
 
 const profileSchema = z.object({
   name: z.string().min(2),
@@ -401,18 +409,49 @@ export default function ProfileForm() {
                 control={form.control}
                 name="dob"
                 render={({ field }) => (
-                  <FormItem>
+                  <FormItem className="flex flex-col">
                     <FormLabel>Date of Birth</FormLabel>
-                    <FormControl>
-                      <div className="relative">
-                        <Calendar className="absolute left-3 top-2.5 h-5 w-5 text-gray-400" />
-                        <Input
-                          type="date"
-                          className="pl-10 rounded-md border-gray-300 focus:ring-2 focus:ring-[#8BAD2B]/30"
-                          {...field}
+                    <Popover>
+                      <PopoverTrigger asChild>
+                        <FormControl>
+                          <Button
+                            variant="outline"
+                            className={cn(
+                              "pl-3 text-left font-normal w-full rounded-md border-gray-300 focus:ring-2 focus:ring-[#8BAD2B]/30",
+                              !field.value && "text-muted-foreground"
+                            )}
+                          >
+                            {field.value ? (
+                              format(new Date(field.value), "PPP")
+                            ) : (
+                              <span>DD_MM_YYYY</span>
+                            )}
+                            <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
+                          </Button>
+                        </FormControl>
+                      </PopoverTrigger>
+                      <PopoverContent
+                        className="w-auto p-0 bg-white shadow-md rounded-md border"
+                        align="start"
+                      >
+                        <Calendar
+                          mode="single"
+                          selected={
+                            field.value ? new Date(field.value) : undefined
+                          }
+                          onSelect={(date) =>
+                            field.onChange(
+                              date ? format(date, "yyyy-MM-dd") : ""
+                            )
+                          }
+                          captionLayout="dropdown"
+                          fromYear={1950}
+                          toYear={new Date().getFullYear()}
+                          className="rounded-md bg-white"
+                          initialFocus
                         />
-                      </div>
-                    </FormControl>
+                      </PopoverContent>
+                    </Popover>
                     <FormMessage />
                   </FormItem>
                 )}

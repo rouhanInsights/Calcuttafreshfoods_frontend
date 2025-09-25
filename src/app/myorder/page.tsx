@@ -83,7 +83,7 @@ export default function OrdersPage() {
 
   return (
     <main className="max-w-5xl mx-auto px-4 py-10 space-y-8">
-      <h1 className="text-2xl font-bold text-gray-800">🧾 My Orders</h1>
+      <h1 className="text-2xl font-bold text-gray-800">My Orders</h1>
 
       {orders.map((order) => (
         <div

@@ -38,7 +38,7 @@ export default async function CategoryPage(props: any) {
 
   return (
     <main className="max-w-7xl mx-auto px-4 py-8">
-      <h1 className="text-2xl font-bold mb-6">{category.category_name} Products</h1>
+      <h1 className="text-2xl font-bold mb-6">{category.category_name}</h1>
       <Suspense fallback={<CategorySkeleton />}>
         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-6">
           {products.map((item) => (
