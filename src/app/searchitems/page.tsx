@@ -10,6 +10,7 @@ type Product = {
   image: string;
   weight: string;
   discount?: string;
+  in_stock?: boolean;
 };
 
 export default async function SearchPage({
@@ -60,6 +61,7 @@ export default async function SearchPage({
             image={item.image}
             weight={item.weight || "—"}
             discount={item.discount ? parseInt(item.discount) : undefined}
+            in_stock={item.in_stock}
           />
         ))}
       </div>

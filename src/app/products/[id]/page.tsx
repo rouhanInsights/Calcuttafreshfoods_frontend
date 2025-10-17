@@ -22,6 +22,7 @@ type Product = {
   short_description?: string;
   discount?: string;
   category_id?: number;
+   in_stock?: boolean;
 };
 
 type Category = {
@@ -313,6 +314,7 @@ export default function ProductDetailPage() {
                         description={product.description}
                         discount={discount}
                         key={product.id}
+                        in_stock={product.in_stock ?? true} 
                       />
                     );
                   })}

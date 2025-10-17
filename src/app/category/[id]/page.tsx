@@ -11,6 +11,7 @@ type Product = {
   discount: number;
   image: string;
   weight: string;
+  in_stock: boolean;
 };
 
 type Category = {
@@ -53,6 +54,7 @@ export default async function CategoryPage(props: any) {
               discount={item.discount}
               image={item.image || "/cp2.webp"}
               weight={item.weight}
+              in_stock={item.in_stock}
             />
           ))}
         </div>
