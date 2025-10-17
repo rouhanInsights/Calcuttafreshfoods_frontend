@@ -15,6 +15,7 @@ export type Product = {
   image: string;
   weight?: string;
   discount?: number;
+  in_stock?: boolean;
 };
 
 export const ProductCard = ({
@@ -26,7 +27,9 @@ export const ProductCard = ({
   image,
   weight,
   discount,
+  in_stock,
 }: Product) => {
+  // console.log("Product:", { name, in_stock, type: typeof( in_stock )});
   const { cart, addToCart, removeFromCart } = useCart();
   const quantity = cart.items.find((item) => item.id === id)?.quantity || 0;
 
@@ -99,7 +102,15 @@ export const ProductCard = ({
 
         {/* Add to Cart / Quantity */}
         <div className="mt-3">
-          {quantity > 0 ? (
+          {!in_stock ? (
+            // Out of stock button
+            <button
+              disabled
+              className="w-full mt-1 py-2 bg-white border border-gray-300 text-red-500 text-sm rounded-full flex justify-center items-center cursor-not-allowed"
+            >
+              Out of Stock
+            </button>
+          ) : quantity > 0 ? (
             <div className="flex justify-center">
               <div className="flex items-center border border-gray-300 rounded-full overflow-hidden text-sm w-32">
                 <button
@@ -137,4 +148,3 @@ export const ProductCard = ({
     </div>
   );
 };
-

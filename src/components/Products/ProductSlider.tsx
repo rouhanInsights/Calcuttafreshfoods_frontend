@@ -12,6 +12,7 @@ type Product = {
   image: string;
   weight?: string;
   discount?: number;
+  in_stock?: boolean;
 };
 
 type ProductSliderProps = {
@@ -32,6 +33,7 @@ export const ProductSlider = ({ products }: ProductSliderProps) => {
             image={product.image}
             weight={product.weight}
             discount={product.discount}
+            in_stock={product.in_stock}
           />
         </div>
       ))}

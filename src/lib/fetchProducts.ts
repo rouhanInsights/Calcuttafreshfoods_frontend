@@ -14,6 +14,7 @@ type ProductFromAPI = {
   weight: string;
   discount?: string;
   stock_quantity?: number;
+  in_stock?: boolean; 
 };
 
 export async function fetchAllProducts() {
@@ -32,6 +33,7 @@ export async function fetchAllProducts() {
     weight: item.weight,
     discount: item.discount ? parseInt(item.discount) : 0,
     stock_quantity: item.stock_quantity ?? 0,
+    in_stock: item.in_stock ?? false,
   }));
 }
 export async function fetchBestSellers() {
@@ -52,6 +54,7 @@ export async function fetchBestSellers() {
     weight: item.weight,
     discount: item.discount ? parseInt(item.discount) : 0,
     stock_quantity: item.stock_quantity ?? 0,
+    in_stock: item.in_stock ?? false,
   }));
 }
 
@@ -74,5 +77,6 @@ export async function fetchTopOffers() {
     weight: item.weight,
     discount: item.discount ? parseInt(item.discount) : 0,
     stock_quantity: item.stock_quantity ?? 0,
+    in_stock: item.in_stock ?? false,
   }));
 }
