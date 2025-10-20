@@ -29,7 +29,7 @@ export const ProductCard = ({
   discount,
   in_stock,
 }: Product) => {
-  console.log("Product:", { name, in_stock, type: typeof( in_stock )});
+  // console.log("Product:", { name, in_stock, type: typeof( in_stock )});
   const { cart, addToCart, removeFromCart } = useCart();
   const quantity = cart.items.find((item) => item.id === id)?.quantity || 0;
 

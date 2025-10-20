@@ -285,11 +285,11 @@ export default function CheckoutPage() {
           router.push(`/orders/success?order_id=${orderData.order_id}`);
         },
         prefill: {
-          email: "", // Optional: fill with user email if available
-          contact: "", // Optional: fill with phone if available
+          email: "calcuttafreshfoods1@gmail.com", // Optional: fill with user email if available
+          contact: "+91 9123929282", // Optional: fill with phone if available
         },
         theme: {
-          color: "#8BAD2B",
+          color: "#0b5e22ff",
         },
       });
 
