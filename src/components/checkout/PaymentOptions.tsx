@@ -12,7 +12,7 @@ type Props = {
 // Only COD and Pay Online options
 const paymentOptions = [
   { value: "COD", label: "Cash on Delivery" },
-  { value: "PAY ONLINE", label: "Pay Online" }, // Generic label for all online options
+  { value: "Pay Online", label: "Pay Online" }, // ✅ Match enum exactly
 ];
 
 export default function PaymentOption({ selected, onChange }: Props) {
